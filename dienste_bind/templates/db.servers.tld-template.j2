@@ -1,4 +1,4 @@
-; zonefile for servers.{{item.key}}.
+; zonefile for {{ [ bind.server_subdomain, item.key ] | select('defined') | join('.') }}.
 $TTL    3600
 @       IN      SOA     {{bind_zonemaster.server}}. {{bind_zonemaster.email}}. (
                      {{ansible_date_time.epoch}}         ; Serial

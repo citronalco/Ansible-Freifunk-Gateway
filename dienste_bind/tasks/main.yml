@@ -27,7 +27,7 @@
     - restart bind9
 
 - name: create own db file for gateway servers and backbone servers
-  template: src=db.servers.ffnet.j2 dest=/etc/bind/db.servers.ffnet
+  template: src=db.servers.ffnet.j2 dest=/etc/bind/db.{{ [ bind.server_subdomain, 'ffnet' ] | select('defined') | join('.') }}
   notify:
     - restart bind9
 
@@ -39,7 +39,7 @@
     - restart bind9
 
 - name: create own db.servers. file for each domain
-  template: src=db.servers.tld-template.j2 dest=/etc/bind/db.servers.{{item.key}}
+  template: src=db.servers.tld-template.j2 dest=/etc/bind/db.{{ [ bind.server_subdomain, 'ffnet' ] | select('defined') | join('.') }}.{{item.key}}
   tags: debug
   with_dict: "{{domains}}"
   notify:

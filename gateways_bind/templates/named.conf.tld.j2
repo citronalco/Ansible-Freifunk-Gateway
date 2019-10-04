@@ -10,9 +10,9 @@ zone "{{domain}}" IN {
 {% endfor %}
 	};
 };
-zone "servers.{{domain}}." IN {
+zone "{{ [ bind.server_subdomain, domain ] | select('defined') | join('.') }}." IN {
 	type slave;
-        file "/etc/bind/slave/db.servers.{{domain}}";
+        file "/etc/bind/slave/db.{{ [ bind.server_subdomain, domain ] | select('defined') | join('.') }}";
 	masters {
 {% for master in bind.ffnet_zone_masters %}
 		{{master}};

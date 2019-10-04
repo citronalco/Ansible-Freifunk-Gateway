@@ -9,9 +9,10 @@ zone "{{domain}}." IN {
 {% endfor %}
 	};
 };
-zone "servers.{{domain}}." IN {
+{{ [ bind.server_subdomain, domain ] | select('defined') | join('.') }}
+zone "{{ [ bind.server_subdomain, domain ] | select('defined') | join('.') }}." IN {
 	type master;
-	file "/etc/bind/db.servers.{{domain}}";
+	file "/etc/bind/db.{{ [ bind.server_subdomain, domain ] | select('defined') | join('.') }}";
 	allow-transfer {
 	   localhost;
 {% for host in groups['gateways'] %}

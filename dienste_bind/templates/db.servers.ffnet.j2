@@ -1,4 +1,4 @@
-; zonefile for servers.{{freifunk.kurzname}}.
+; zonefile for {{ [ bind.server_subdomain, freifunk.kurzname ] | select('defined') | join('.') }}.
 $TTL    86400
 @       IN      SOA     {{bind_zonemaster.server}}. {{bind_zonemaster.email}}. (
                      {{ansible_date_time.epoch}}         ; Serial
@@ -7,7 +7,7 @@ $TTL    86400
                         2419200         ; Expire
                           86400 )       ; Negative Cache TTL
 ;
-@			IN      NS      {{bind.ns_name}}.servers.{{freifunk.kurzname}}.
+@			IN      NS      {{ [ bind.ns_name, bind.server_subdomain, freifunk.kurzname ] | select('defined') | join('.') }}.
 {{bind.ns_name}}			IN      A       {{ansible_default_ipv4.address}}
 {% for host in groups['gateways'] %}
 {% if hostvars[host].domaenenliste is defined %}

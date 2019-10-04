@@ -9,9 +9,9 @@ view "domaene-{{domaene[0]}}" {
 	include "/etc/bind/named.conf.tld";
 	include "/etc/bind/named.conf.local";
 	include "/etc/bind/named.conf.default-zones";
-	zone "servers.{{freifunk.kurzname}}." {
+	zone "{{ [ bind.server_subdomain, freifunk.kurzname ] | select('defined') | join('.') }}" {
 		type master;
-		file "/etc/bind/db.servers.ffnet";
+		file "/etc/bind/db.{{ [ bind.server_subdomain, 'ffnet' ] | select('defined') | join('.') }}";
 		allow-transfer {
 			{{domaene[1].ffv4_network | ipsubnet(28,0)}};
 		};
