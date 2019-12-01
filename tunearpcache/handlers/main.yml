@@ -1,7 +1,7 @@
 ---
 # Globale Handler Definitioen 
 
-- name: restart sysctl 
-  shell: "sysctl --system" 
+- name: restart sysctl
+  command: "sysctl --system"
 
 

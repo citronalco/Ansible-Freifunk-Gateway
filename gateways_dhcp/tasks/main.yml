@@ -3,7 +3,7 @@
 - name: install requirements
   apt: pkg=rsync state=present
 
-- name: create persitent folder dhcpd data
+- name: create persistent folder dhcpd data
   file: path=/var/lib/dhcp_persistent state=directory mode=0755
   notify:
     - restart isc-dhcp-server
@@ -33,7 +33,7 @@
 - name: install isc-dhcp-server
   apt: pkg=isc-dhcp-server state=present
 
-- name: create dhcp defaults 
+- name: create dhcp defaults
   template: src=isc-dhcp-server.j2 dest=/etc/default/isc-dhcp-server
   notify:
     - restart isc-dhcp-server
@@ -43,7 +43,8 @@
   notify:
     - restart isc-dhcp-server
 
-- stat: path=/var/lib/dhcp/dhcpd.leases
+- name: check if leases file exists
+  stat: path=/var/lib/dhcp/dhcpd.leases
   register: leases4_file
 
 - name: create folder for isc-dhcp-server service override file

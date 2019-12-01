@@ -1,7 +1,7 @@
 ---
 - name: Install dependencies
   apt:
-    pkg: ['python3', 'ethtool', 'lsb-release' ]
+    pkg: ['python3', 'ethtool', 'lsb-release']
     state: present
 
 - name: Clone mesh-announce repo
@@ -11,6 +11,8 @@
     clone: yes
     update: yes
   notify: restart respondd
+  tags:
+    - skip_ansible_lint
 
 - name: create systemd file
   template:

@@ -1,6 +1,20 @@
 ---
 - name: restart networking
-  shell: systemctl restart networking; if systemctl -q is-active isc-dhcp-server; then systemctl restart isc-dhcp-server; fi; if systemctl -q is-active kea-dhcp4.service; then systemctl restart kea-dhcp4.service; fi; if systemctl -q is-active tunneldigger; then systemctl restart tunneldigger; fi
+  service_facts:
+  changed_when: true
+  notify: restart services
+
+- name: restart services
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - networking
+    - isc-dhcp-server
+    - kea-dhcp4
+    #- tunneldigger
+  when: item in ansible_facts.services and ansible_facts.services[item].state == "running"
 
 - name: restart fastd
   service: name=fastd state=restarted
+

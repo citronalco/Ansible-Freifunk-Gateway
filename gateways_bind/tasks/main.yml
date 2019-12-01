@@ -51,10 +51,10 @@
     - restart bind9
 
 - name: create own db file for each subdomaene
-  template: src=db.ffnet.j2 dest=/etc/bind/db.domaene-{{item}}.ffnet
+  template: src=db.ffnet.j2 dest=/etc/bind/db.domaene-{{ item }}.ffnet
   notify:
     - restart bind9
-  with_items: "{{domaenenliste | default([])}}"
+  with_items: "{{ domaenenliste | default([]) }}"
   when: domaenenliste is defined
 
 - name: create folder for bind9.service file
