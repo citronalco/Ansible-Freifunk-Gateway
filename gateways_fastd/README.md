@@ -42,5 +42,4 @@ domaenenliste:
      dhcp_ende: 10.10.39.255
      fastd: true
 ```
-~
 
