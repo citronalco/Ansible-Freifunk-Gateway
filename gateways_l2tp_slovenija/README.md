@@ -4,9 +4,9 @@ Diese Rolle installiert auf Gateways tunneldigger von https://github.com/wlanslo
 
 Für jede Domäne wird eine eigene tunneldigger-Instanz gestartet.
 
-Die Broker-Komponente von Tunneldigger lauscht auf eingehende Verbindungen auf Port 20000 + Domänennummer, also z.B. für Domäne 11 auf Port 20011. Dieser Port muss für die Access Points in der site.conf unter mesh_vpn.tunneldigger.brokers angegeben werden.
+Die Broker-Komponente von Tunneldigger lauscht auf eingehende Verbindungen auf Port 20000 + Domänennummer, also z.B. für Domäne 11 auf Port 20011. Dieser Port muss für die Access Points in der `site.conf` unter `mesh_vpn.tunneldigger.brokers` angegeben werden.
 
-Der L2TP-Tunnel selbst wird dann vom Gateway über den unten als "port_base" konfigurierten Port aufgebaut.
+Der L2TP-Tunnel selbst wird dann vom Gateway über den unten mit `port_base` konfigurierten Port aufgebaut.
 
 Zur Konfiguration muss die Dictionary-Variable `tunneldigger` mit den beiden Einträgen `max_tunnels` und `port_base` gesetzt werden, üblicherweise in den `group_vars`:
 
