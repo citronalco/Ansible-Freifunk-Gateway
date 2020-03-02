@@ -25,7 +25,7 @@ ffrl_tun:
   v6_local: 2a03:2260:0:6d::2/64
   v6_remote: 2a03:2260:0:6d::1/64
 ```
-`name` ist ein frei wählbarer Name für den Tunnel (Achtung: Keine Bindestriche oder Leerzeichen verwenden!), aus dem die Bezeichnung für die virtuelle Netzwerkschnittstelle des Tunnels gebildet wird: Tunnel "dus" liegt auf Interface "tun-ffrl-dus", "fra" auf "tun-ffrl-fra".
+`name` ist ein frei wählbarer Name für den Tunnel (Achtung: Keine Bindestriche oder Leerzeichen verwenden!), aus dem die Bezeichnung für die virtuelle Netzwerkschnittstelle des Tunnels gebildet wird: Tunnel "dus" wird auf das Interface "tun-ffrl-dus" gelegt, "fra" auf "tun-ffrl-fra".
 
 `gre_target` ist der Server bei Freifunk Rheinland, mit dem der Tunnel aufgebaut wird.
 
