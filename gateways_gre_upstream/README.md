@@ -8,6 +8,8 @@ Ein GRE-Tunnel funktioniert nur mit der IP-Adresse aus, mit der er bei Freifunk 
 Er kann also nicht auf einem anderen Gateway verwendet werden.
 
 ### Konfiguration: ####
+Die benötigten Daten bekommt man von Freifunk Rheinland.
+
 `host_vars/beispielgateway:`
 
 ```
