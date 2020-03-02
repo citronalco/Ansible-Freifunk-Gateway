@@ -1,4 +1,4 @@
-Diese Rolle installert L2TP-Unterstützung
+Diese Rolle installert Unterstützung für L2TP-Tunnel
 
 Dazu wird tunneldigger von https://github.com/wlanslovenija/tunneldigger installiert.
 Für jede Domäne wird eine eigene tunneldigger-Instanz gestartet.
