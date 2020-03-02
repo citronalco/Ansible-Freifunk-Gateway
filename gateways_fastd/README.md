@@ -3,7 +3,7 @@ Diese Rolle installiert Unterstützung für fastd-Tunnel
 Für jede Domäne wird ein eigener fastd-Prozess gestartet. Der Port, auf dem fastd jeweils lauschen soll, wird aus einem Basis-Port und der Domänennummer berechnet. Jeder fastd-Prozess verwendet ein eigenes Schlüsselpaar.
 Damit fastd installiert wird muss pro Gateway und Domäne explizit aktiviert werden.
 
-#### Ports und MTU ####
+### Ports und MTU ###
 Die globale Konfiguration erfolgt durch die Variable `fastd` (z.B. in `group_vars/all` definieren):
 ```
 fastd:
@@ -26,7 +26,7 @@ domaenen:
     ...
 ```
 
-#### Schlüsselpaar ####
+### Schlüsselpaar ###
 Fastd benötigt pro Domäne und pro Server ein Schlüsselpaar. Ein Schlüsselpaar besteht aus Secret-Key und Public-Key.
 Der Secret-Key wird vom fastd-Prozess auf dem Server benötigt.
 Der Public-Key wird in der site.conf veröffentlicht und von den Access Points benutzt, um sich mit dem fastd-Prozess auf dem Gateway zu verbinden. 
@@ -34,7 +34,7 @@ Der Public-Key wird in der site.conf veröffentlicht und von den Access Points b
 Das Schlüsselpaar kann im Ansible Inventory in `host_vars/<servername>` in der Variable `domaenenliste.<Domänennummer>.fastd_key.secret` bzw. `domaenenliste.<Domänennummer>.fastd_key.public` gesetzt werden.
 Wird dies nicht getan und es existiert auf dem Server für die jeweilige Domäne noch kein Schlüsselpaar, so wird ein Secret- und Public-Key direkt auf dem Server erzeugt und verwendet. 
 
-#### Aktivierung ####
+### Aktivierung ###
 Damit fastd auf einem Gateway für eine Domäne gestartet wird, muss entweder im Inventory des Gateways das Schlüsselpaar in der Variable `domaenenliste.<Domänennummer>.fastd_key` gesetzt sein oder alternativ die Variable `domaenenliste.<Domänennummer>.fastd` auf "true" gesetzt werden. Ansonsten wird kein fastd-Prozess gestartet:
 
 ```
