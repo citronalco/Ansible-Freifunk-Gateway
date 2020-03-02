@@ -46,13 +46,13 @@ domaenenliste:
        secret: 16091b4c32c2a6414b9ffe8f4c43df0569e40da964bf38f03c107eccf89842ae
        public: 13ec900257659ebe6eb071a1135a8bd840e29339d881e1176d64cd2c6076fb0a
    "20":
-     dhcp_start: 10.10.20.0
-     dhcp_ende: 10.10.29.255
-   "30":
      dhcp_start: 10.10.30.0
      dhcp_ende: 10.10.39.255
      fastd: true
+   "30":
+     dhcp_start: 10.10.20.0
+     dhcp_ende: 10.10.29.255
 ```
 - Domäne 10: fastd wird gestartet, dabei wird der angegebene fastd_key benutzt.
-- Domäne 20: fastd wird nicht gestartet.
-- Domäne 30: fastd wird gestartet. Wenn auf dem Gateway bereits ein fastd-Key für diese Domäne existiert dann wird dieser benutzt, ansonsten wird ein neuer fastd-Key erzeugt.
+- Domäne 20: fastd wird gestartet. Wenn auf dem Gateway bereits ein fastd-Key für diese Domäne existiert dann wird dieser benutzt, ansonsten wird ein neuer fastd-Key erzeugt.
+- Domäne 30: fastd wird nicht gestartet weil weder die Variable "fastd_key" noch die Variable "fastd" gesetzt ist.
