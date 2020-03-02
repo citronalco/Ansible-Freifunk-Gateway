@@ -13,9 +13,10 @@ fastd:
 `mtu` (optional): MTU für fastd. Muss mit dem mesh_vpn.mtu-Wert in site.conf übereinstimmen. Wenn nicht gesetzt wird 1406 benutzt.
 
 `port_base`: Aus "port_base" + Domänennummer ergibt sich der Port, auf dem fastd für jeweilige Domäne lauscht. Der Port muss mit dem in der site.conf gesetzten Port übereinstimmen.
+
 **Beispiel:** Wenn "port_base" auf 10000 gesetzt ist, lauscht fastd für Domäne 10 auf Port 10010 und für Domäne 20 auf Port 10020.
 
-Wenn der über "port_base" berechnete fastd-Port für eine Domäne nicht passt, kann für diese Domäne der fastd-Port mit der der Variable `domaenen.<Domänennummer>.fastd_port_forced` abweichend gesetzt werden:
+Falls der über "port_base" berechnete fastd-Port für eine Domäne nicht passt, kann für diese Domäne der fastd-Port mit der der Variable `domaenen.<Domänennummer>.fastd_port_forced` abweichend gesetzt werden:
 ```
 domaenen:
   "10":
