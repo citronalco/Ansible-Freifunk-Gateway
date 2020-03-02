@@ -1,6 +1,10 @@
 Diese Rolle installiert fastd
 
-Die globale Konfiguration erfolgt durch die Variable `fastd` (am Besten in `group_vars/all` definieren):
+Für jede Domäne wird ein eigener fastd-Prozess gestartet. Der Port, auf dem fastd jeweils lauschen soll, wird aus einem Basis-Port und der Domänennummer berechnet. Jeder fastd-Prozess verwendet ein eigenes Schlüsselpaar.
+Damit fastd installiert wird muss pro Gateway und Domäne explizit aktiviert werden.
+
+#### Ports und MTU ####
+Die globale Konfiguration erfolgt durch die Variable `fastd` (z.B. in `group_vars/all` definieren):
 ```
 fastd:
   mtu: 1320
@@ -21,10 +25,16 @@ domaenen:
     ...
 ```
 
-Fastd benötigt pro Domäne und pro Server ein Schlüsselpaar. Der Public Key wird in der site.conf veröffentlicht, der Private Key wird auf dem Server benötigt.
+#### Schlüsselpaar ####
+Fastd benötigt pro Domäne und pro Server ein Schlüsselpaar. Ein Schlüsselpaar besteht aus Secret-Key und Public-Key.
+Der Secret-Key wird vom fastd-Prozess auf dem Server benötigt.
+Der Public-Key wird in der site.conf veröffentlicht und von den Access Points benutzt, um sich mit dem fastd-Prozess auf dem Gateway zu verbinden. 
 
-Das Schlüsselpaar kann im Ansible Inventory in `host_vars/<servername>` gesetzt werden. Wird dies nicht getan und es existiert auf dem Server für die jeweilige Domäne noch kein Schlüsselpaar wird ein Public- und Private Key direkt auf dem Server erzeugt und verwendet.
+Das Schlüsselpaar kann im Ansible Inventory in `host_vars/<servername>` in der Variable `domaenenliste.<Domänennummer>.fastd_key.secret` bzw. `domaenenliste.<Domänennummer>.fastd_key.public` gesetzt werden.
+Wird dies nicht getan und es existiert auf dem Server für die jeweilige Domäne noch kein Schlüsselpaar, so wird ein Secret- und Public-Key direkt auf dem Server erzeugt und verwendet. 
 
+#### Aktivierung ####
+Damit fastd auf einem Gateway für eine Domäne gestartet wird, muss entweder im Inventory des Gateways das Schlüsselpaar in der Variable `domaenenliste.<Domänennummer>.fastd_key` gesetzt sein oder alternativ die Variable `domaenenliste.<Domänennummer>.fastd` auf "true" gesetzt werden. Ansonsten wird kein fastd-Prozess gestartet:
 
 ```
 domaenenliste:
@@ -32,8 +42,8 @@ domaenenliste:
      dhcp_start: 10.10.10.0
      dhcp_ende: 10.10.19.255
      fastd_key:
-       secret: 010101010101010101010101
-       public: 2222222222222222222222222
+       secret: 16091b4c32c2a6414b9ffe8f4c43df0569e40da964bf38f03c107eccf89842ae
+       public: 13ec900257659ebe6eb071a1135a8bd840e29339d881e1176d64cd2c6076fb0a
    "20":
      dhcp_start: 10.10.20.0
      dhcp_ende: 10.10.29.255
@@ -42,4 +52,6 @@ domaenenliste:
      dhcp_ende: 10.10.39.255
      fastd: true
 ```
-
+- Domäne 10: fastd wird gestartet, dabei wird der angegebene fastd_key benutzt.
+- Domäne 20: fastd wird nicht gestartet.
+- Domäne 30: fastd wird gestartet. Wenn auf dem Gateway bereits ein fastd-Key für diese Domäne existiert dann wird dieser benutzt, ansonsten wird ein neuer fastd-Key erzeugt.
