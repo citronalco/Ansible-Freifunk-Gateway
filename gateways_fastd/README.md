@@ -6,7 +6,7 @@ Für jede Domäne wird ein eigener fastd-Prozess gestartet. Der Port, auf dem fa
 Damit fastd installiert wird muss pro Gateway und Domäne explizit aktiviert werden.
 
 ### Ports und MTU ###
-Die globale Konfiguration erfolgt durch die Variable `fastd` (z.B. in `group_vars/all` definieren):
+Die globale Konfiguration erfolgt durch die Variable `fastd` (üblicherweise in `group_vars/all`):
 ```
 fastd:
   mtu: 1320
