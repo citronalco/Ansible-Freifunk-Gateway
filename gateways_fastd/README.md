@@ -1,4 +1,4 @@
-Diese Rolle installiert fastd
+Diese Rolle installiert Unterstützung für fastd-Tunnel
 
 Für jede Domäne wird ein eigener fastd-Prozess gestartet. Der Port, auf dem fastd jeweils lauschen soll, wird aus einem Basis-Port und der Domänennummer berechnet. Jeder fastd-Prozess verwendet ein eigenes Schlüsselpaar.
 Damit fastd installiert wird muss pro Gateway und Domäne explizit aktiviert werden.
