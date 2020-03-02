@@ -1,6 +1,6 @@
 ## GRE-Tunnel zu Freifunk Rheinland
 
-Diese Rolle richtet auf Gateways die GRE-Tunnel zu Freifunk Rheinland ein. Es werden nur die Netzwerkinterfaces angelegt.
+Diese Rolle legt auf Gateways die GRE-Tunnel zu Freifunk Rheinland an.
 
 GRE-Tunnel können bei Freifunk Rheinland hier beantragt werden: https://ticket.freifunk-rheinland.net, Topic: Backbone AS201701
 
@@ -8,24 +8,26 @@ Ein GRE-Tunnel funktioniert nur mit der IP-Adresse aus, mit der er bei Freifunk 
 Er kann also nicht auf einem anderen Gateway verwendet werden.
 
 ### Konfiguration: ####
+`host_vars/beispielgateway:`
 
-Achtung: Keine Namen mit Bindestrich für die Tunnel verwenden.
-
-host_vars/beispielgateway:
-
+```
 ffrl_tun:
-- name: fra_a
+- name: dus
+  gre_target: 185.66.193.0
+  v4_local: 100.64.0.209/31
+  v4_remote: 100.64.0.208/31
+  v6_local: 2a03:2260:0:6e::2/64
+  v6_remote: 2a03:2260:0:6e::1/64
+- name: fra
   gre_target: 185.66.194.0
-  v4_remote: 100.64.0.140/31
-  v4_local: 100.64.0.141/31
-  v6_remote: 2a03:2260:0:4e::1/64
-  v6_local: 2a03:2260:0:4e::2/64
-- name: ber_a
-  gre_target: 185.66.195.0
-  v4_remote: 100.64.0.142/31
-  v4_local: 100.64.0.143/31
-  v6_remote: 2a03:2260:0:4f::1/64
-  v6_local: 2a03:2260:0:4f::2/64
+  v4_local: 100.64.0.207/31
+  v4_remote: 100.64.0.206/31
+  v6_local: 2a03:2260:0:6d::2/64
+  v6_remote: 2a03:2260:0:6d::1/64
+```
+`name` ist ein frei wählbarer Name für den Tunnel (Achtung: Keine Namen mit Bindestrich verwenden!), aus dem die Bezeichnung für die virtuelle Netzwerkschnittstelle des Tunnels gebildet wird: Tunnel `dus` liegt auf Interface `tun-ffrl-dus`, `fra` auf `tun-ffrl-fra`.
 
-Die `*_local`-Adressen sind die Adressen auf dem Gateway, die `*_remote`-Adressen die bei Freifunk Rheinland.
+`gre_target` ist der Server bei Freifunk Rheinland, mit dem der Tunnel aufgebaut wird.
 
+Jeder Tunnel hat hat zwei Enden, ein GRE-Tunnel hat zusätzlich an jedem Ende je eine IPv4- und eine IPv6-Adresse:
+Die `*_local`-Adressen sind die Tunnelendpunkte auf dem Gateway, die `*_remote`-Adressen die Tunnelendpunkte bei Freifunk Rheinland.
