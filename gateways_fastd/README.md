@@ -14,9 +14,9 @@ fastd:
 ```
 `mtu` (optional): MTU für fastd. Muss mit dem mesh_vpn.mtu-Wert in site.conf übereinstimmen. Wenn nicht gesetzt wird 1406 benutzt.
 
-`port_base`: Aus "port_base" + Domänennummer ergibt sich der Port, auf dem fastd für jeweilige Domäne lauscht. Der Port muss mit dem in der site.conf gesetzten Port übereinstimmen.
+`port_base`: Aus `port_base` + Domänennummer ergibt sich der Port, auf dem fastd für die jeweilige Domäne lauscht. Der Port muss mit dem in der `site.conf` gesetzten Port übereinstimmen.
 
-**Beispiel:** Wenn "port_base" auf 10000 gesetzt ist, lauscht fastd für Domäne 10 auf Port 10010 und für Domäne 20 auf Port 10020.
+**Beispiel:** Wenn `port_base` auf 10000 gesetzt ist, lauscht fastd für Domäne 10 auf Port 10010 und für Domäne 20 auf Port 10020.
 
 Falls der über "port_base" berechnete fastd-Port für eine Domäne nicht passt, kann für diese Domäne der fastd-Port mit der der Variable `domaenen.<Domänennummer>.fastd_port_forced` abweichend gesetzt werden:
 ```
@@ -31,7 +31,7 @@ domaenen:
 ### Schlüsselpaar ###
 Fastd benötigt pro Domäne und pro Server ein Schlüsselpaar. Ein Schlüsselpaar besteht aus Secret-Key und Public-Key.
 Der Secret-Key wird vom fastd-Prozess auf dem Server benötigt.
-Der Public-Key wird in der site.conf veröffentlicht und von den Access Points benutzt, um sich mit dem fastd-Prozess auf dem Gateway zu verbinden. 
+Der Public-Key wird in der `site.conf` veröffentlicht und von den Access Points benutzt, um sich mit dem fastd-Prozess auf dem Gateway zu verbinden. 
 
 Das Schlüsselpaar kann im Ansible Inventory in `host_vars/<servername>` in der Variable `domaenenliste.<Domänennummer>.fastd_key.secret` bzw. `domaenenliste.<Domänennummer>.fastd_key.public` gesetzt werden.
 Wird dies nicht getan und es existiert auf dem Server für die jeweilige Domäne noch kein Schlüsselpaar, so wird ein Secret- und Public-Key direkt auf dem Server erzeugt und verwendet. 
@@ -58,4 +58,4 @@ domaenenliste:
 ```
 - Domäne 10: fastd wird gestartet, dabei wird der angegebene fastd_key benutzt.
 - Domäne 20: fastd wird gestartet. Wenn auf dem Gateway bereits ein fastd-Key für diese Domäne existiert dann wird dieser benutzt, ansonsten wird ein neuer fastd-Key erzeugt.
-- Domäne 30: fastd wird nicht gestartet weil weder die Variable "fastd_key" noch die Variable "fastd" gesetzt ist.
+- Domäne 30: fastd wird nicht gestartet weil weder die Variable `fastd_key` mit den Schlüsseln existiert noch die Variable `fastd` auf "true" gesetzt ist.
