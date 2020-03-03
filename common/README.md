@@ -1,4 +1,4 @@
-### Rolle für allgemeine Servereinstellungen
+### Allgemeine Servereinstellungen
 
 Diese Rolle sollte immer eingebunden werden.
 
