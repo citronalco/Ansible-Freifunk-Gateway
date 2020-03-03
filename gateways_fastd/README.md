@@ -1,4 +1,4 @@
-## Rolle für die Unterstützung für fastd-Tunnel
+## Rolle für die Unterstützung von fastd-Tunneln
 
 Diese Rolle installiert fastd auf Gateways.
 
