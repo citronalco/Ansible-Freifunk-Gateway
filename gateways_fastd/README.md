@@ -3,7 +3,7 @@
 Diese Rolle installiert fastd auf Gateways.
 
 Für jede Domäne wird ein eigener fastd-Prozess gestartet. Der Port, auf dem fastd jeweils lauschen soll, wird aus einem Basis-Port und der Domänennummer berechnet. Jeder fastd-Prozess verwendet ein eigenes Schlüsselpaar.
-Damit fastd installiert wird muss pro Gateway und Domäne explizit aktiviert werden.
+Fastd muss pro Gateway und Domäne explizit aktiviert werden.
 
 ### Ports und MTU ###
 Die globale Konfiguration erfolgt durch die Variable `fastd` (üblicherweise in `group_vars/all`):
