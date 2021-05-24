@@ -9,7 +9,7 @@ E-Mails werden nur von localhost angenommen und dann an den in der Variable "mai
 Die Konfiguration erfolgt durch die Variable "mail":
 ```
 mail:
-  senderemail: Absender-E-Mail-Adresse
+  senderemail: Bestimmte Absender-E-Mail-Adresse für alle von diesem Server gesendeten E-Mails erzwingen (optional)
   smtp: SMTP-Server:Portnummer (Portnummer ist optional, Standard: 25)
   user: Benutzername am SMTP-Server
   pw: Passwort am SMTP-Server
