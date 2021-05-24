@@ -1,7 +1,7 @@
 # icinga2-server
 
 Diese Rolle installiert Icinga2 und optional IcingaWeb2.
-Es wird die Rolle exim4-daemon-light benötigt.
+Für den E-Mail-Versand wird ein lokaler Mailserver benötigt (z.B. Rolle exim4-daemon-light).
 
 ## Konfiguration
 Die Konfiguration erfolgt durch Variable "icinga2":
