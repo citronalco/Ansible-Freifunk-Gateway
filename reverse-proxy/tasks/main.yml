@@ -26,8 +26,8 @@
 
 - name: Check if certificates do already exist
   stat:
-    path: /etc/letsencrypt/live/{{ item }}.{{ freifunk.domain }}/cert.pem
-  loop: '{{ reverse_proxy.https | list | map("regex_replace", ":.*", "") | list | unique }}'
+    path: /etc/letsencrypt/live/{{ item.split(":")[0] }}.{{ freifunk.domain }}/cert.pem
+  loop: '{{ reverse_proxy.https.keys() }}'
   register: letsencrypt_cert
 
 - name: Stop Nginx to allow Certbot to generate certificates
@@ -37,10 +37,10 @@
   when: letsencrypt_cert.results | selectattr('stat.exists','equalto', false) | list | count > 0
 
 - name: Create certificates
-  command: /usr/bin/certbot certonly --non-interactive --nginx --agree-tos --email {{ freifunk.email }} -d {{ item }}.{{ freifunk.domain }}
+  command: "/usr/bin/certbot certonly --non-interactive --nginx --agree-tos --email {{ freifunk.email }} {{ [ '-d ' ] | product( [ item.key.split(':')[0] + '.' + freifunk.domain ] + item.value.aliases | default([]) ) | map('join') | join(' ') }}"
   args:
-    creates: /etc/letsencrypt/live/{{ item }}.{{ freifunk.domain }}/cert.pem
-  loop: '{{ reverse_proxy.https | list | map("regex_replace", ":.*", "") | list | unique }}'
+    creates: /etc/letsencrypt/live/{{ item.key.split(":")[0] }}.{{ freifunk.domain }}/cert.pem
+  loop: '{{ reverse_proxy.https | dict2items }}'
 
 - name: Start Nginx after certificates have been generated
   service:

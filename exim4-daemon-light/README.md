@@ -13,7 +13,7 @@ mail:
   smtp: SMTP-Server:Portnummer (Portnummer ist optional, Standard: 25)
   user: Benutzername am SMTP-Server
   pw: Passwort am SMTP-Server
-  force_hostname: Hostnamen, der für das SMTP-Helo am SMTP-Server verwendet wird (optional)
+  force_hostname: Hostnamen, der für das SMTP-Helo am SMTP-Server verwendet wird (optional, default: Hostname des Servers)
 ```
 
 **Beispiel:**
