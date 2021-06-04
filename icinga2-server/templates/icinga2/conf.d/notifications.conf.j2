@@ -20,7 +20,7 @@ apply Notification "mail-icingaadmin" to Host {
   //vars.notification_logtosyslog = true
 {% if icinga2.mail_sender is defined %}
   vars.notification_from = "<{{ icinga2.mail_sender }}>"
-{ endif %}
+{% endif %}
   assign where host.vars.notification.mail
 }
 
@@ -34,7 +34,7 @@ apply Notification "mail-icingaadmin" to Service {
   //vars.notification_logtosyslog = true
 {% if icinga2.mail_sender is defined %}
   vars.notification_from = "<{{ icinga2.mail_sender }}>"
-{ endif %}
+{% endif %}
 
   assign where host.vars.notification.mail
 }
