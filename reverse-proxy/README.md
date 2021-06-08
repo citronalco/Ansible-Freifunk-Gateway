@@ -20,6 +20,7 @@ reverse_proxy:
       aliases:
         - <hostname>
       backend: <Protokoll>://<Host>[:Port]
+      anonymize: False
   https:
     <Subdomain>[:Port]:
       aliases:
@@ -34,6 +35,9 @@ Je nachdem, ob die Subdomain im Abschnitt "http" oder "https" konfiguriert wird,
 
 Die Angabe von **Port** ist optional. Als Standard wird "443" bei im Abschnitt "https" gelisteten Subdomains und "80" bei "http" verwendet.
 
+#### Aliases (Optional)
+Soll die Subdomain zusätzlich auf Anfragen auf einen oder mehrere Aliasnamen antworten, können diese Aliasnamen als FQDN angegeben werden.
+
 #### Backend
 Das Backend ist der interne Server, der die Anfragen für die jeweilige Subdomain beantworten soll.
 
@@ -44,8 +48,8 @@ Wenn als Backend-Protokoll https verwendet wird und als "Host" ein IP-Adresse an
 
 Die Angabe von **Port** ist optional. Wenn kein Port angegeben ist wird "80" verwendet.
 
-#### Aliases (Optional)
-Soll die Subdomain zusätzlich auf Anfragen auf einen oder mehrere Aliasnamen antworten, können diese Aliasnamen als FQDN angegeben werden.
+#### Anonymize
+Optional. Wenn **anonymize** auf "False" gesetzt ist, wird für diese Subdomain die Anonymisierung der IP-Adressen in der Logdatei deaktiviert.
 
 
 ## Beispiel:
@@ -69,9 +73,10 @@ reverse_proxy:
         - demo2.test.com
     baz:
       backend: https://127.0.0.1:8080
+      anonymize: False
 ```
 Hier leitet der Reverse-Proxy vom Internet eingehende Anfragen wie folgt an interne Webserver weiter:
 - "http://foo.freifunk-musterstadt.de" zu "http://192.168.123.5:82"
 - "http://bar.freifunk-musterstadt.de:464" zu "https://example.com", der Reverse Proxy überprüft das Zertifikat von example.com
 - "https://foo.freifunk-musterstadt.de", "https://demo.test.com" und "https://demo2.test.com" zu "http://192.168.123.5:82"
-- "https://baz.freifunk-musterstadt.de" zu "https://127.0.0.1:8080", der Reverse-Proxy überprüft **nicht** das Zertifikat von 127.0.0.1:8080
+- "https://baz.freifunk-musterstadt.de" zu "https://127.0.0.1:8080", der Reverse-Proxy überprüft **nicht** das Zertifikat von 127.0.0.1:8080. Die IP-Adressen der zugreifenden Clients werden ohne Anonymisierung protokolliert.

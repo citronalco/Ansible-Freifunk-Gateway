@@ -7,8 +7,13 @@ server {
     server_name {{ ([ item.key.split(":")[0] + "." + freifunk.domain ] + item.value.aliases | default([])) | join(" ") }};
 
     location / {
+{% if item.value.anonymize | default(True) %}
         proxy_set_header X-Real-IP $ip_anonymized;
         proxy_set_header X-Forwarded-For $ip_anonymized;
+{% else %}
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+{% endif %}
         proxy_set_header Host $host;
         proxy_buffering off;
 
@@ -19,5 +24,9 @@ server {
         proxy_pass {{ item.value.backend }};
     }
 
+{% if item.value.anonymize | default(True) %}
     access_log /var/log/nginx/access.log anonymized;
+{% else %}
+    access_log /var/log/nginx/access.log;
+{% endif %}
 }
