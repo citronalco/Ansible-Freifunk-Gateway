@@ -4,7 +4,7 @@ server {
     listen {{ item.key.split(":")[1] | default("80") }};
     listen [::]:{{ item.key.split(":")[1] | default("80") }};
 
-    server_name {{ item.key.split(":")[0] }}.{{ freifunk.domain }};
+    server_name {{ ([ item.key.split(":")[0] + "." + freifunk.domain ] + item.value.aliases | default([])) | join(" ") }};
 
     location / {
         proxy_set_header X-Real-IP $ip_anonymized;

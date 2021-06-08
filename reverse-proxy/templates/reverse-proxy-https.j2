@@ -4,7 +4,7 @@ server {
     listen {{ item.key.split(":")[1] | default("443") }} ssl http2;
     listen [::]:{{ item.key.split(":")[1] | default("443") }} ssl http2;
 
-    server_name {{ item.key.split(":")[0] }}.{{ freifunk.domain }};
+    server_name {{ ([ item.key.split(":")[0] + "." + freifunk.domain ] + item.value.aliases | default([])) | join(" ") }};
 
     ssl_certificate /etc/letsencrypt/live/{{ item.key.split(":")[0] }}.{{ freifunk.domain }}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ item.key.split(":")[0] }}.{{ freifunk.domain }}/privkey.pem;

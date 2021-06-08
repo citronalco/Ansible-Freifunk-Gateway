@@ -17,9 +17,13 @@ Die Zuordnung von Subdomain zu internem Webserver erfolgt über die Variable `re
 reverse_proxy:
   http:
     <Subdomain>[:Port]:
+      aliases:
+        - <hostname>
       backend: <Protokoll>://<Host>[:Port]
   https:
     <Subdomain>[:Port]:
+      aliases:
+        - <hostname>
       backend: <Protokoll>://<Host>[:Port]
 ```
 
@@ -30,7 +34,7 @@ Je nachdem, ob die Subdomain im Abschnitt "http" oder "https" konfiguriert wird,
 
 Die Angabe von **Port** ist optional. Als Standard wird "443" bei im Abschnitt "https" gelisteten Subdomains und "80" bei "http" verwendet.
 
-### Backend
+#### Backend
 Das Backend ist der interne Server, der die Anfragen für die jeweilige Subdomain beantworten soll.
 
 Das **Protokoll** das Backends kann entweder "http" oder "https" sein.
@@ -39,6 +43,9 @@ Als **Host** kann entweder eine IP-Adresse oder ein Hostname eingetragen werden.
 Wenn als Backend-Protokoll https verwendet wird und als "Host" ein IP-Adresse angegeben ist, dann wird das Zertifikat des Backend-Servers nicht geprüft.
 
 Die Angabe von **Port** ist optional. Wenn kein Port angegeben ist wird "80" verwendet.
+
+#### Aliases (Optional)
+Soll die Subdomain zusätzlich auf Anfragen auf einen oder mehrere Aliasnamen antworten, können diese Aliasnamen als FQDN angegeben werden.
 
 
 ## Beispiel:
@@ -57,11 +64,14 @@ reverse_proxy:
   https:
     foo:
       backend: http://192.168.123.5:82
+      aliases:
+        - demo.test.com
+        - demo2.test.com
     baz:
       backend: https://127.0.0.1:8080
 ```
 Hier leitet der Reverse-Proxy vom Internet eingehende Anfragen wie folgt an interne Webserver weiter:
 - "http://foo.freifunk-musterstadt.de" zu "http://192.168.123.5:82"
 - "http://bar.freifunk-musterstadt.de:464" zu "https://example.com", der Reverse Proxy überprüft das Zertifikat von example.com
-- "https://foo.freifunk-musterstadt.de" zu "http://192.168.123.5:82"
+- "https://foo.freifunk-musterstadt.de", "https://demo.test.com" und "https://demo2.test.com" zu "http://192.168.123.5:82"
 - "https://baz.freifunk-musterstadt.de" zu "https://127.0.0.1:8080", der Reverse-Proxy überprüft **nicht** das Zertifikat von 127.0.0.1:8080
