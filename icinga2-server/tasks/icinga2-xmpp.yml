@@ -4,7 +4,7 @@
 
 - name: Clone XMPPNotify
   git:
-    repo: https://github.com/Finn10111/XMPPNotify.git
+    repo: http://git.bingo-ev.de/xmpp/XMPPNotify.git 
     dest: /opt/icinga2-XMPPNotify
     update: yes
 
