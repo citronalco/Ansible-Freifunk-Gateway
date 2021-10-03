@@ -8,8 +8,9 @@
 # gluster volume <VOLNAME> remove-brick replica <COUNT> <BRICK> ...
 
 # Cluster-Pool
+# Auf allen Rechnern laufen lassen, damit der "servers.freifunk-domain"-Name als "other Name" drin steht! Sonst fehlt der von dem Rechner, auf dem das Kommando ausgeführt wird.
 - name: Alle Gateways zum Pool hinzufügen (auf dem ersten Server)
   gluster_peer:
     state: present
-    nodes: "{{ groups['gateways'] }}"
-  when: inventory_hostname == groups['gateways'][0]
+    nodes: "{{ groups['gateways'] | product(['.servers.' + freifunk.domain ]) | map('join') }} "
+  #when: inventory_hostname == groups['gateways'][0]

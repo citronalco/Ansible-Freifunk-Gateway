@@ -7,9 +7,9 @@
   gluster_volume:
     state: present
     volume: "{{ item.name }}"
-    bricks: "/mnt/glusterfs/{{ item.name }}.image"
+    bricks: "/mnt/glusterfs/{{ item.name }}.image/brick"
     replicas: "{{ groups['gateways'] | length }}"
-    cluster: "{{ groups['gateways'] }}"
+    cluster: "{{ groups['gateways'] | product(['.servers.' + freifunk.domain ]) | map('join') }}"
     rebalance: yes
     #force: yes
     options:

@@ -36,3 +36,10 @@
     opts: rw,auto
     state: mounted
   loop: "{{ glusterfs.volumes }}"
+
+- name: Erstelle Brick-Verzeichnis
+  file:
+    path: "/mnt/glusterfs/{{ item.name }}.image/brick"
+    state: directory
+    mode: 0755
+  loop: "{{ glusterfs.volumes }}"
