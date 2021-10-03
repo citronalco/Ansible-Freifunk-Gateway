@@ -1,0 +1,26 @@
+# raslöschen, force, rebalance, replica-count
+
+# TLS!
+
+# Volume anlegen
+- name: Lege GlusterFS-Volume an
+  gluster_volume:
+    state: present
+    volume: "{{ item.name }}"
+    bricks: "/mnt/glusterfs/{{ item.name }}.image"
+    replicas: "{{ groups['gateways'] | length }}"
+    cluster: "{{ groups['gateways'] }}"
+    rebalance: yes
+    #force: yes
+    options:
+      { network.ping-timeout 5,
+        performance.cache_size: 256MB,
+        performance.cache-max-file-size: 5MB,
+      }
+
+
+  loop: "{{ glusterfs.volumes }}"
+  #when: inventory_hostname == groups['gateways'][0]     # run_once: true?
+  run_once: true
+
+# Ansible Bug? Nach gluster_volume sind hier die Hostvars hin!

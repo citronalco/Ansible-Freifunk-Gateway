@@ -1,0 +1,19 @@
+# raslöschen, force, rebalance, replica-count
+
+# Glusterfs-Volume mounten
+- name: Lege Mountpunkt für Volume an
+  file:
+    path: "/mnt/glusterfs/{{ item.name }}"
+    state: directory
+    mode: 0755
+  loop: "{{ glusterfs.volumes }}"
+
+
+- name: Mounte Volume
+  mount:
+    src: "localhost:{{ item.name }}"
+    path: "/mnt/glusterfs/{{ item.name }}"
+    fstype: "glusterfs"
+    opts: "x-systemd-automount,defaults"
+    state: mounted
+  loop: "{{ glusterfs.volumes }}"

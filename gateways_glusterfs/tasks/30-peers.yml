@@ -1,0 +1,15 @@
+# TODO:
+# nur ab 3 Gateways!
+# alte peers löschen!
+# alte Volumes auflösen
+# alte Bricks rausschmeissen
+# alte Images löschen
+
+# gluster volume <VOLNAME> remove-brick replica <COUNT> <BRICK> ...
+
+# Cluster-Pool
+- name: Alle Gateways zum Pool hinzufügen (auf dem ersten Server)
+  gluster_peer:
+    state: present
+    nodes: "{{ groups['gateways'] }}"
+  when: inventory_hostname == groups['gateways'][0]

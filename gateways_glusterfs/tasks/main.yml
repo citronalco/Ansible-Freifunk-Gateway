@@ -1,0 +1,12 @@
+# die nummerierten includen, wen glusterfs getzt und anzahl gateways >=3
+# Handler laufen lassen! sonst gibt's die GRE-Devices nicht!
+
+- import_tasks: 10-bricks.yml
+
+- import_tasks: 20-software.yml
+
+- import_tasks: 30-peers.yml
+
+- import_tasks: 40-volumes.yml
+
+- import_tasks: 50-mount.yml

@@ -1,0 +1,13 @@
+# TODO:
+# Nicht auf allen Interfaces lauschen! https://serverfault.com/questions/864634/how-can-i-bind-glusterfsd-process-to-an-interface-ip
+
+# Software installieren
+- name: Installiere Softwarepakete
+  apt:
+    name: [ "glusterfs-server", "glusterfs-client", "rpcbind" ]
+
+- name: Starte glusterd
+  systemd:
+    name: "glusterd"
+    state: started
+    enabled: yes

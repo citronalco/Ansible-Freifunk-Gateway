@@ -1,0 +1,38 @@
+# Image-Datei
+- name: Lege Image-Datei an
+  command:
+    cmd: "dd if=/dev/zero of='/glusterfs-{{ item.name }}.image' bs=1M count={{ item.size }}"
+    creates: "/glusterfs-{{ item.name }}.image"
+  loop: "{{ glusterfs.volumes }}"
+  register: image_created
+
+- name: Setze Zugriffsrechte für Image-Datei
+  file:
+    path: "/glusterfs-{{ item.name }}.image"
+    state: file
+    mode: 0600
+  loop: "{{ glusterfs.volumes }}"
+  when: image_created.changed
+
+- name: Formatiere Image-Datei
+  filesystem:
+    fstype: ext4
+    dev: "/glusterfs-{{ item.name }}.image"
+  loop: "{{ glusterfs.volumes }}"
+  when: image_created.changed
+
+- name: Lege Mountpunkt für Image-Datei an
+  file:
+    path: "/mnt/glusterfs/{{ item.name }}.image"
+    state: directory
+    mode: 0755
+  loop: "{{ glusterfs.volumes }}"
+
+- name: Erstelle fstab-Eintrag und mounte Image-Datei
+  mount:
+    src: "/glusterfs-{{ item.name }}.image"
+    path: "/mnt/glusterfs/{{ item.name }}.image"
+    fstype: ext4
+    opts: rw,auto
+    state: mounted
+  loop: "{{ glusterfs.volumes }}"
