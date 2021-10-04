@@ -9,6 +9,7 @@
   loop: "{{ gluster.volumes }}"
 
 
+# nur wenn Server
 - name: Mounte Volume
   mount:
     src: "localhost:{{ item.name }}"
@@ -17,3 +18,5 @@
     opts: "x-systemd-automount,defaults"
     state: mounted
   loop: "{{ gluster.volumes }}"
+
+# TODO: Mount für reine Clients

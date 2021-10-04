@@ -2,13 +2,19 @@
 # Handler laufen lassen! sonst gibt's die GRE-Devices nicht!
 
 - import_tasks: 10-bricks.yml
+  where: gluster is defined
 
 - import_tasks: 20-software.yml
+  where: gluster is defined
 
 - import_tasks: 25-tls-selfsigned.yml
+  where: gluster is defined
 
 - import_tasks: 30-peers.yml
+  where: gluster is defined
 
 - import_tasks: 40-volumes.yml
+  where: gluster is defined
 
 - import_tasks: 50-mount.yml
+  where: gluster is defined

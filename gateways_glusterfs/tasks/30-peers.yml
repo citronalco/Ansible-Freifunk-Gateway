@@ -13,7 +13,7 @@
 - name: Alle Gateways zum Pool hinzufügen (auf dem ersten Server)
   gluster_peer:
     state: present
-    nodes: "{{ groups['gateways'] | product(['.servers.' + freifunk.domain ]) | map('join') }} "
+    nodes: "{{ groups['gateways'] | product([ '.' + freifunk.domain ]) | map('join') }} "
   run_once: yes
   #when: inventory_hostname == groups['gateways'][0]
  # Eigenen Rechner rausfiltern?

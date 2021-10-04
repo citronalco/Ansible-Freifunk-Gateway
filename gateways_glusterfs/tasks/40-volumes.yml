@@ -8,7 +8,7 @@
     volume: "{{ item.name }}"
     bricks: "/mnt/glusterfs/{{ item.name }}.image/brick"
     replicas: "{{ groups['gateways'] | length }}"
-    cluster: "{{ groups['gateways'] | product(['.servers.' + freifunk.domain ]) | map('join') }}"
+    cluster: "{{ groups['gateways'] | product([ '.' + freifunk.domain ]) | map('join') }}"
     rebalance: no  # nur wenn anzahl replicas != anzahl bricks
     #remove_bricks: yes  # noch dev
     options:
