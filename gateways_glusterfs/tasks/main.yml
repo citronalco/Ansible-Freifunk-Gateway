@@ -5,6 +5,8 @@
 
 - import_tasks: 20-software.yml
 
+- import_tasks: 25-tls-selfsigned.yml
+
 - import_tasks: 30-peers.yml
 
 - import_tasks: 40-volumes.yml

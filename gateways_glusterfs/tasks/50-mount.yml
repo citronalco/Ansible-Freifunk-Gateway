@@ -6,7 +6,7 @@
     path: "/mnt/glusterfs/{{ item.name }}"
     state: directory
     mode: 0755
-  loop: "{{ glusterfs.volumes }}"
+  loop: "{{ gluster.volumes }}"
 
 
 - name: Mounte Volume
@@ -16,4 +16,4 @@
     fstype: "glusterfs"
     opts: "x-systemd-automount,defaults"
     state: mounted
-  loop: "{{ glusterfs.volumes }}"
+  loop: "{{ gluster.volumes }}"
