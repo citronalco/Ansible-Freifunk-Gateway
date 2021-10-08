@@ -1,0 +1,48 @@
+- name: Lege Image-Datei an
+  command:
+    cmd: 'dd if=/dev/zero of=''{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) }}'' bs=1M count={{ item.bricksize }}'
+    creates: '{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) }}'
+  loop: "{{ gluster_server }}"
+  when: inventory_hostname in item.peers
+  register: image_created
+
+- name: Setze Zugriffsrechte für Image-Datei
+  file:
+    path: '{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) }}'
+    state: file
+    mode: 0600
+  loop: "{{ gluster_server }}"
+  when: image_created.changed and inventory_hostname in item.peers
+
+- name: Formatiere Image-Datei
+  filesystem:
+    fstype: ext4
+    dev: '{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) }}'
+  loop: "{{ gluster_server }}"
+  when: image_created.changed and inventory_hostname in item.peers
+
+- name: Lege Mountpunkt für Image-Datei an
+  file:
+    path: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}'
+    state: directory
+    mode: 0755
+  when: inventory_hostname in item.peers
+  loop: "{{ gluster_server }}"
+
+- name: Erstelle fstab-Eintrag und mounte Image-Datei
+  mount:
+    src: '{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) }}'
+    path: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}'
+    fstype: ext4
+    opts: rw,auto
+    state: mounted
+  when: image_created.changed and inventory_hostname in item.peers
+  loop: "{{ gluster_server }}"
+
+- name: Erstelle Brick-Verzeichnis
+  file:
+    path: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}/brick'
+    state: directory
+    mode: 0755
+  when: image_created.changed and inventory_hostname in item.peers
+  loop: "{{ gluster_server }}"

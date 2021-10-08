@@ -7,32 +7,55 @@
     path: /etc/ssl/glusterfs.key
     size: 2048
   notify: restart glusterd
+  register: privatekey
 
-- name: Erzeuge Self-Signed-Zertifikat
+- name: Prüfe ob Self-Signed-Zertifikat bereits vorhanden
+  stat:
+    path: /etc/ssl/glusterfs.pem
+  register: certfile
+
+- name: Erstelle CSR
+  openssl_csr:
+    path: "/tmp/{{ inventory_hostname }}.{{ freifunk.domain }}.csr"
+    privatekey_path: /etc/ssl/glusterfs.key
+    common_name: "{{ inventory_hostname }}.{{ freifunk.domain }}"
+  when: not certfile.stat.exists or privatekey.changed
+
+- name: Erstelle Self-Signed-Zertifikat
   openssl_certificate:
     path: /etc/ssl/glusterfs.pem
     privatekey_path: /etc/ssl/glusterfs.key
     selfsigned_not_after: "+36500d"
     provider: selfsigned
+    csr_path: "/tmp/{{ inventory_hostname }}.{{ freifunk.domain }}.csr"
   notify: restart glusterd
+  when: not certfile.stat.exists or privatekey.changed
+
+- name: Lösche CSR
+  file:
+    path: "/tmp/{{ inventory_hostname }}.{{ freifunk.domain }}.csr"
+    state: absent
 
 - name: Lese Self-Signed-Zertifikat
   slurp:
     src: /etc/ssl/glusterfs.pem
-  register: certfile
+  register: cert
 
 - name: Speichere Self-Signed-Zertifikat als Fact
   set_fact:
-    glusterfs_cert: "{{ certfile['content'] | b64decode }}"
+    glusterfs_cert: "{{ cert['content'] | b64decode }}"
 
 - name: Speichere die Zertifikate aller Gluster-Peers
   copy:
-    content: "{{ groups['gateways'] | map('extract',hostvars, ['glusterfs_cert']) | join }}"
+    content: "{{ ansible_play_hosts | map('extract',hostvars, ['glusterfs_cert']) | join }}"
     dest: /etc/ssl/glusterfs.ca
   notify: restart glusterd
 
 - name: TLS für Management-Traffic einschalten
-  file:
-    path: /var/lib/glusterd/secure-access
-    state: touch
+  copy:
+    content: ""
+    dest: /var/lib/glusterd/secure-access
   notify: restart glusterd
+
+- name: Starte glusterd neu
+  meta: flush_handlers

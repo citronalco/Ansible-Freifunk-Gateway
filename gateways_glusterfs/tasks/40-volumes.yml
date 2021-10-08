@@ -4,18 +4,18 @@
 - name: Lege GlusterFS-Volume an
   gluster_volume:
     state: present
-    host: "{{ inventory_hostname }}.servers.{{ freifunk.domain }}"
-    volume: "{{ item.name }}"
-    bricks: "/mnt/glusterfs/{{ item.name }}.image/brick"
-    replicas: "{{ groups['gateways'] | length }}"
-    cluster: "{{ groups['gateways'] | product([ '.' + freifunk.domain ]) | map('join') }}"
+    host: "{{ inventory_hostname }}.{{ freifunk.domain }}"
+    volume: "{{ item.volume }}"
+    bricks: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}/brick'
+    replicas: "{{ item.peers | length }}"
+    cluster: "{{ item.peers | product([ '.' + freifunk.domain ]) | map('join') }}"
     rebalance: no  # nur wenn anzahl replicas != anzahl bricks
     #remove_bricks: yes  # noch dev
     options:
       network.ping-timeout: "10"
       client.ssl: "on"
       server.ssl: "on"
-  loop: "{{ gluster.volumes }}"
+  loop: "{{ gluster_server }}"
   run_once: true
 
 # Ansible Bug? Nach gluster_volume sind hier die Hostvars hin! - aber nur wenn sie "glusterfs" heißt... :(

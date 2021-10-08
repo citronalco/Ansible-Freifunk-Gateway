@@ -1,9 +1,8 @@
 - name: Installiere Softwarepakete
   apt:
-    name: [ "glusterfs-server", "glusterfs-client", "rpcbind" ]
+    name: [ "glusterfs-server", "glusterfs-client", "rpcbind", "psmisc" ]
 
-- name: Starte glusterd
+- name: Lade glusterd-Service beim Systemstart
   systemd:
     name: "glusterd"
-    state: started
     enabled: yes

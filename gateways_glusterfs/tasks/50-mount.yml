@@ -1,22 +1,20 @@
-# raslöschen, force, rebalance, replica-count
-
-# Glusterfs-Volume mounten
 - name: Lege Mountpunkt für Volume an
   file:
-    path: "/mnt/glusterfs/{{ item.name }}"
+    path: "{{ item.path }}"
     state: directory
     mode: 0755
-  loop: "{{ gluster.volumes }}"
+  loop: "{{ gluster_client }}"
+  when: gluster_client is defined
 
-
-# nur wenn Server
 - name: Mounte Volume
   mount:
-    src: "localhost:{{ item.name }}"
-    path: "/mnt/glusterfs/{{ item.name }}"
+    src: "{{ gluster_server | selectattr('volume', 'equalto', item.volume) | map(attribute='peers') | first | product([ '.' + freifunk.domain + ':' + item.volume ]) | map('join') | first }}"
+    path: "{{ item.path }}"
     fstype: "glusterfs"
-    opts: "x-systemd-automount,defaults"
-    state: mounted
-  loop: "{{ gluster.volumes }}"
-
-# TODO: Mount für reine Clients
+    opts: "x-systemd-automount,_netdev,defaults,backup-volfile-servers={{ (gluster_server | selectattr('volume', 'equalto', item.volume) | map(attribute='peers') | first | product([ '.' + freifunk.domain ]) | map('join'))[1:] | join (':') }}"
+    state: present
+  loop: "{{ gluster_client }}"
+  when: gluster_client is defined
+  notify:
+  - reread systemd configs
+  - restart remote-fs
