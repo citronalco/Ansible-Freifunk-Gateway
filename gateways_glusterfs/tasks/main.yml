@@ -8,7 +8,10 @@
 - import_tasks: 30-peers.yml
 
 - import_tasks: 35-bricks.yml
+  when: gluster_server is defined
 
 - import_tasks: 40-volumes.yml
+  when: gluster_server is defined
 
 - import_tasks: 50-mount.yml
+  when: gluster_client is defined

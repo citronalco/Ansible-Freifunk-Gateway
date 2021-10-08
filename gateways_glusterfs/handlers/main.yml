@@ -1,33 +1,7 @@
-# Bug: Da bleiben Prozesse übrig!
-#- name: restart glusterd
-#  service:
-#    name: glusterd
-#    state: restarted
-
-- name: stop glusterd
+- name: restart glusterd
   service:
     name: glusterd
-    state: stopped
-  listen: restart glusterd
-
-- name: kill glusterfs
-  command:
-    cmd: killall glusterfs --wait
-  ignore_errors: yes
-  listen: restart glusterd
-
-- name: kill glusterfsd
-  command:
-    cmd: killall glusterfsd --wait
-  ignore_errors: yes
-  listen: restart glusterd
-
-- name: start glusterd
-  service:
-    name: glusterd
-    state: started
-  listen: restart glusterd
-
+    state: restarted
 
 - name: reread systemd configs
   systemd:

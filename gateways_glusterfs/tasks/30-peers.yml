@@ -7,11 +7,6 @@
 
 # gluster volume <VOLNAME> remove-brick replica <COUNT> <BRICK> ...
 
-- name: Starte glusterd
-  service:
-    name: glusterd
-    state: started
-
 # Cluster-Pool
 - name: Alle Gateways zum Pool hinzufügen (auf dem ersten Server)
   gluster_peer:

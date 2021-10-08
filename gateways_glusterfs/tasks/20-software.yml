@@ -6,3 +6,4 @@
   systemd:
     name: "glusterd"
     enabled: yes
+    state: started

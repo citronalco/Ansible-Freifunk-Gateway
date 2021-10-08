@@ -1,21 +1,41 @@
 # raslöschen, force, rebalance, replica-count
 
 # Volume anlegen
+# FIXME: Bei mehr als 3 Servern ist "Anzahl Replicas = Anzahl Server" eine große Platzverschwendung.
+#   Aber dann müsste man gelöschte Server auch aus dem Volume entfernen und danach ein Rebalance durchführen.
+#   Entfernen geht mit Ansible aber noch nicht.
 - name: Lege GlusterFS-Volume an
   gluster_volume:
     state: present
     host: "{{ inventory_hostname }}.{{ freifunk.domain }}"
     volume: "{{ item.volume }}"
     bricks: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}/brick'
-    replicas: "{{ item.peers | length }}"
+    replicas: "{{ item.peers | length }}"  # mind. 3
     cluster: "{{ item.peers | product([ '.' + freifunk.domain ]) | map('join') }}"
-    rebalance: no  # nur wenn anzahl replicas != anzahl bricks
-    #remove_bricks: yes  # noch dev
+    rebalance: no  # nur wenn anzahl replicas < anzahl bricks
+    #remove_bricks: yes  # kommt in einer zukünftigen Ansible-Version
     options:
       network.ping-timeout: "10"
       client.ssl: "on"
       server.ssl: "on"
   loop: "{{ gluster_server }}"
   run_once: true
-
 # Ansible Bug? Nach gluster_volume sind hier die Hostvars hin! - aber nur wenn sie "glusterfs" heißt... :(
+
+
+# Aus unbekannten Gründen müssen die Gluster-Demons nach Neuanlage eine Volumes neu gestartet werden - und "systemctl restart glusterd" lässt Prozesse übrig
+# FIXME: Die nächsten drei Schritte nur dann auf allen Servern ausführen, wenn der Schritt oben auf irgendeinem Server durchgeführt wurde - nur wie?
+- name: stop glusterd
+  service:
+    name: glusterd
+    state: stopped
+
+- name: kill glusterfsd
+  command:
+    cmd: killall glusterfsd --wait
+  ignore_errors: yes
+
+- name: start glusterd
+  service:
+    name: glusterd
+    state: started
