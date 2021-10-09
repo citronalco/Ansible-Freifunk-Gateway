@@ -1,15 +1,15 @@
-# raslöschen, force, rebalance, replica-count
+# TODO: Gelöschte Peers aus Volume entfernen und Replica-Count anpassen
 
 # Volume anlegen
-# FIXME: Bei mehr als 3 Servern ist "Anzahl Replicas = Anzahl Server" eine große Platzverschwendung.
+# FIXME: Bei mehr als 3 Servern ist "Anzahl Replicas = Anzahl Server" eine große Platzverschwendung, "dispersed" wäre da besser.
 #   Aber dann müsste man gelöschte Server auch aus dem Volume entfernen und danach ein Rebalance durchführen.
 #   Entfernen geht mit Ansible aber noch nicht.
-- name: Lege GlusterFS-Volume an
+- name: Lege replicated GlusterFS-Volume an
   gluster_volume:
     state: present
     host: "{{ inventory_hostname }}.{{ freifunk.domain }}"
     volume: "{{ item.volume }}"
-    bricks: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}/brick'
+    bricks: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}/brick'  # mind. 3, Anzahl Bricks muss Vielfaches von "Replicas" sein
     replicas: "{{ item.peers | length }}"  # mind. 3
     cluster: "{{ item.peers | product([ '.' + freifunk.domain ]) | map('join') }}"
     rebalance: no  # nur wenn anzahl replicas < anzahl bricks
@@ -20,11 +20,30 @@
       server.ssl: "on"
   loop: "{{ gluster_server }}"
   run_once: true
+
+#- name: Lege dispersed GlusterFS-Volume an
+#  gluster_volume:
+#    state: present
+#    host: "{{ inventory_hostname }}.{{ freifunk.domain }}"
+#    volume: "{{ item.volume }}"
+#    bricks: '/mnt/glusterfs/{{ item.brickfile | default(["/glusterfs-", item.volume, ".image" ] | join ) | basename }}/brick'
+#    disperses: "{{ item.peers | length }}"  # mind. 3
+#    redundancies: "{{ item.redundancies | default((item.peers | length - 1) / 2 ) | int }}" # 1 bei 3-4 Server, 2 bei 5-6 Server, 3 bei 7-8 Server,... (ist die Anzahl der Server die Ausfallen darf)
+#    cluster: "{{ item.peers | product([ '.' + freifunk.domain ]) | map('join') }}"
+#    rebalance: no  # nur bei distributed volumes wenn anzahl replicas < anzahl bricks
+#    #remove_bricks: yes  # kommt in einer zukünftigen Ansible-Version
+#    options:
+#      network.ping-timeout: "10"
+#      client.ssl: "on"
+#      server.ssl: "on"
+#  loop: "{{ gluster_server }}"
+#  run_once: true
+
 # Ansible Bug? Nach gluster_volume sind hier die Hostvars hin! - aber nur wenn sie "glusterfs" heißt... :(
 
 
 # Aus unbekannten Gründen müssen die Gluster-Demons nach Neuanlage eine Volumes neu gestartet werden - und "systemctl restart glusterd" lässt Prozesse übrig
-# FIXME: Die nächsten drei Schritte nur dann auf allen Servern ausführen, wenn der Schritt oben auf irgendeinem Server durchgeführt wurde - nur wie?
+# FIXME: Die nächsten drei Schritte nur dann auf allen Servern ausführen, wenn der Schritt oben auf irgendeinem Server durchgeführt wurde - nur wie geht das in Ansible?
 - name: stop glusterd
   service:
     name: glusterd
