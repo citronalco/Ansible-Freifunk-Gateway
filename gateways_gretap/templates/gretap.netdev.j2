@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+
+# GRETAP Tunnel for domaene-{{ item.1 }} to {{ item.0.key }}
+
+[NetDev]
+Name=t{{ item.1 }}-{{ item.0.key }}
+MTUBytes=1462
+
+[Tunnel]
+{% if build_tunnels_over_ipv6_if_available is defined and build_tunnels_over_ipv6_if_available and ipv6 is defined and hostvars[item.0.key].ipv6 is defined %}
+Kind=ip6gretap
+Local={{ ipv6 }}
+Remote={{ hostvars[item.0.key].ipv6 }}
+{% else %}
+Kind=gretap
+Local={{ ipv4 }}
+Remote={{ hostvars[item.0.key].ipv4 }}
+{% endif %}
+TTL=64
+Key={{item.1|int}}

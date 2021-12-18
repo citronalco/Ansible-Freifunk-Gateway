@@ -1,16 +1,41 @@
 ---
 # Tasks for getap network interfaces
 
-# create file for gre interfaces
-- name: Create interfaces - inter_gre file
-  template: src="gretap.j2" dest="/etc/network/interfaces.d/30_gretap.cfg"
-  notify:
-    - restart networking
-  when: domaenenliste is defined
+- name: Figure out connections between servers per domain
+  set_fact:
+    connections: "{{ connections | default({}) | combine({ item: hostvars[item]['domaenenliste'] | default({}) | list | intersect(domaenenliste | default({}) | list)}) }}"
+  loop: "{{ ((groups['gateways'] | default([])) + (groups['mapserver'] | default([]))) | reject('search',inventory_hostname) }}"
 
-#append line in interfaces file for reading additional config files
-- name: let read interfaces from interfaces
-  lineinfile: dest="/etc/network/interfaces" line="source /etc/network/interfaces.d/*"
-  notify:
-    - restart networking
-  when: domaenenliste is defined
+- name: Create GRETAP network configs
+  template:
+    src: "gretap.network.j2"
+    dest: "/etc/systemd/network/30_gretap_{{ item.1 }}_{{ item.0.key }}.network"
+  loop: "{{ connections | dict2items | subelements('value') }}"
+  loop_control:
+    index_var: indexer
+  notify: restart networkd
+
+- name: Create GRETAP network interfaces
+  template:
+    src: "gretap.netdev.j2"
+    dest: "/etc/systemd/network/30_gretap_{{ item.1 }}_{{ item.0.key }}.netdev"
+  loop: "{{ connections | dict2items | subelements('value') }}"
+  notify: restart networkd
+
+- name: Attach GRETAP network interfaces to physical IPv4 interface
+  template:
+    src: "gretap-tunnels-ipv4.network.j2"
+    dest: "/etc/systemd/network/30_gretap_ipv4.network"
+  notify: restart networkd
+
+- name: Attach GRETAP network interfaces to physical IPv6 interface
+  template:
+    src: "gretap-tunnels-ipv4.network.j2"
+    dest: "/etc/systemd/network/30_gretap_ipv6.network"
+  notify: restart networkd
+
+- name: remove deprecated /etc/network/interfaces.d/30_gretap.cfg
+  file:
+    path: "/etc/network/interfaces.d/30_gretap.cfg"
+    state: absent
+  notify: restart networking

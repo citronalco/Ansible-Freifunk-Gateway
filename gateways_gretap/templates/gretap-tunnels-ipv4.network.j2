@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+[Match]
+Name={{ ansible_default_ipv4.interface }}
+
+[Network]
+{% for item in connections | dict2items | subelements('value') %}
+{% if not (build_tunnels_over_ipv6_if_available is defined and build_tunnels_over_ipv6_if_available and ipv6 is defined and hostvars[item.0.key].ipv6 is defined) %}
+Tunnel=t{{ item.1 }}-{{ item.0.key }}
+{% endif %}
+{% endfor %}

@@ -13,3 +13,7 @@
   systemd:
     daemon_reload: yes
 
+- name: restart networkd
+  systemd:
+    name: systemd-networkd
+    state: restarted

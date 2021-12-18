@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+[NetDev]
+Name=tun-ffrl-{{ item.name }}
+Kind=gre
+MTUBytes=1400
+
+[Tunnel]
+Local={{ ansible_default_ipv4.address }}
+Remote={{ item.gre_target | ipaddr('address') }}
+TTL=255

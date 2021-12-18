@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+# GRETAP Tunnel for domaene-{{ item.1 }} to {{ item.0.key }}
+
+[Match]
+Name=t{{ item.1 }}-{{ item.0.key }}
+
+[Network]
+Address=de:ad:be:ef:{{ indexer }}:{{ vm_id }}
+BatmanAdvanced=bat{{ item.1 }}

@@ -1,0 +1,39 @@
+# {{ ansible_managed }}
+
+[Match]
+Name=lo
+
+{% if ffrl_tun is defined and ffrl_nat_ip is defined %}
+[Network]
+Address={{ ffrl_nat_ip }}
+
+[RoutingPolicyRule]
+From={{ ffrl_nat_ip }}
+Table=ffnet
+
+[RoutingPolicyRule]
+IncomingInterface=lo
+Table=ffnet
+SuppressPrefixLength=0
+
+{% elif ffnw_tun is defined and ffnw_nat_ip is defined %}
+[Network]
+Address={{ ffnw_nat_ip }}
+
+[RoutingPolicyRule]
+From={{ ffnw_nat_ip }}
+Table=ffnet
+
+{% else %}
+[Network]
+Address=10.0.0.{{vm_id}}
+
+[RoutingPolicyRule]
+From=10.0.0.{{vm_id}}
+Table=ffnet
+{% endif %}
+
+[RoutingPolicyRule]
+IncomingInterface=lo
+Table=ffnet
+SuppressPrefixLength=0

@@ -1,13 +1,13 @@
 ---
-- name: let read interfaces from interfaces
+- name: let read interfaces from interfaces.d
   lineinfile: dest="/etc/network/interfaces" line="source /etc/network/interfaces.d/*"
   notify:
     - restart networking
 
 - name: Konfig für die lo-Schnittstelle
-  template: src="lo.j2" dest="/etc/network/interfaces.d/00_lo.cfg"
+  template: src="lo.network.j2" dest="/etc/systemd/network/00_lo.network.cfg"
   notify:
-    - restart networking
+    - restart networkd
 
 - name: lo-Block aus interfaces entfernen
   lineinfile: dest="/etc/network/interfaces" line="auto lo" state="absent"
@@ -15,9 +15,52 @@
 - name: lo-Block aus interfaces entfernen
   lineinfile: dest="/etc/network/interfaces" line="iface lo inet loopback" state="absent"
 
-- name: Create interfaces - gretap to ffrl or ffnw
-  template: src="gre_upstream.j2" dest="/etc/network/interfaces.d/40_gre_upstream.cfg"
+- name: Delete deprecated /etc/network/interfaces.d/00_log.cfg
+  file:
+    path: "/etc/network/interfaces.d/00_lo.cfg"
+    state: absent
   notify:
     - restart networking
-  when: ffrl_tun is defined or ffnw_tun is defined
 
+- name: Create network configs - gretap to ffrl
+  template:
+    src: "gre_upstream_tun_ffrl.network.j2"
+    dest: "/etc/systemd/network/40_gre_upstream_tun_ffrl_{{ item.name }}.network"
+  loop: "{{ ffrl_tun }}"
+  when: ffrl_tun is defined
+  notify:
+    - restart networkd
+
+- name: Create network interfaces - gretap to ffrl
+  template:
+    src: "gre_upstream_tun_ffrl.netdev.j2"
+    dest: "/etc/systemd/network/40_gre_upstream_tun_ffrl_{{ item.name }}.netdev"
+  loop: "{{ ffrl_tun }}"
+  when: ffrl_tun is defined
+  notify:
+    - restart networkd
+
+- name: Create network configs - gretap to ffnw
+  template:
+    src: "gre_upstream_tun_ffnw.network.j2"
+    dest: "/etc/systemd/network/40_gre_upstream_tun_ffnw_{{ item.name }}.network"
+  loop: "{{ ffnw_tun }}"
+  when: ffnw_tun is defined
+  notify:
+    - restart networkd
+
+- name: Create network interfaces - gretap to ffnw
+  template:
+    src: "gre_upstream_tun_ffnw.netdev.j2"
+    dest: "/etc/systemd/network/40_gre_upstream_tun_ffnw_{{ item.name }}.netdev"
+  loop: "{{ ffnw_tun }}"
+  when: ffnw_tun is defined
+  notify:
+    - restart networkd
+
+- name: Delete deprecated /etc/network/interfaces.d/40_gre_upstream.cfg
+  file:
+    path: "/etc/network/interfaces.d/40_gre_upstream.cfg"
+    state: absent
+  notify:
+    - restart networking

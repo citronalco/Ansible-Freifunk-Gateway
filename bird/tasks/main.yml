@@ -61,3 +61,16 @@
     dest: /etc/systemd/system/bird6.service.d/override.conf
   notify:
     - reread systemd configs
+
+- name: create folder /etc/systemd/networkd.conf.d
+  file:
+    path: /etc/systemd/networkd.conf.d
+    state: directory
+    mode: 0755
+
+- name: publish routing table name
+  copy:
+    src: ffnet.conf
+    dest: /etc/systemd/networkd.conf.d/routetable-ffnet.conf
+    mode: 0644
+  notify: restart networkd

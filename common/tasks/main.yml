@@ -153,3 +153,9 @@
     regexp: "^MaxBandwidth"
     line: "MaxBandwidth 1000"
     state: present
+
+- name: systemd-networkd einschalten
+  systemd:
+    name: systemd-networkd
+    state: started
+    enabled: yes
