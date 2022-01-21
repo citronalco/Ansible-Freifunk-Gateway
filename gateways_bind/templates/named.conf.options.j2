@@ -7,7 +7,8 @@ options {
 
 	recursion yes;
 	allow-recursion {
-		localhost; 
+		127.0.0.0/8;
+		::1;
 {% if domaenenliste is defined %}
 {% for domaene in domaenenliste|dictsort %}
 		{{domaenen[domaene[0]].ffv4_network}};
@@ -17,7 +18,22 @@ options {
 	};
 
 	auth-nxdomain no;    # conform to RFC1035
+{% if domaenenliste is defined %}
+	listen-on {
+		127.0.0.1;
+{% for domaene in domaenenliste|dictsort %}
+		{{domaenen[domaene[0]].ffv4_network | ipaddr(domaenenliste[domaene[0]].server_id) | ipaddr('address') }};
+{% endfor %}
+	};
+	listen-on-v6 {
+		::1;
+{% for domaene in domaenenliste|dictsort %}
+		{{domaenen[domaene[0]].ffv6_network | ipaddr(domaenenliste[domaene[0]].server_id) | ipaddr('address') }};
+{% endfor %}
+	};
+{% else %}
 	listen-on-v6 { any; };
+{% endif %}
 	minimal-responses yes;
 	tcp-clients 1000;
 	recursive-clients 10000;
