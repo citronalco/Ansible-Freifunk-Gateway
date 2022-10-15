@@ -39,9 +39,9 @@ apply Service "web-yanic-nodes-json" {
     vars.http_ssl =			"true"
     vars.http_uri =			"/yanic/nodes.json"
     vars.http_maxage =			"900"				# max. age of http document in seconds
-    vars.http_pagesize =		"50000"			# min. size in bytes
-    vars.http_expect_body_eregi =       "^\\{\"version\":.+\"timestamp\".+\"nodes\":\\{\"\\w+\":\\{(\"firstseen\".+){20,}\\}\\}\\}\\}$$"
-    vars.http_headerstring =		"Content-Type: application/json"
+    vars.http_pagesize =		"50000"				# min. size in bytes
+    vars.http_expect_body_eregi =       "^\\{\"version\":.+\"timestamp\".+\"nodes\":\\[\\{\"firstseen\".+{20,}\\}\\}\\]\\}$$"
+    vars.http_headerstring =            "Content-Type: application/json"
     assign where host.vars.vhost && "web-meshviewer" in host.vars.webpage
 }
 
