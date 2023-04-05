@@ -130,3 +130,14 @@ apply Service "web-grafana" {
     assign where host.vars.vhost && "web-grafana" in host.vars.webpage
 }
 
+
+### Unifi Controller ###
+apply Service "web-controller" {
+    import "generic-service"
+    display_name =			"Website: Unifi Controller"
+    check_command =			"http"
+    vars.http_ssl =			"true"
+    vars.http_uri =			"/manage/account/login"
+    vars.http_port =			8443
+    assign where "web-controller" in host.vars.webpage
+}
