@@ -55,3 +55,16 @@ object Host "grafana.freifunk-ingolstadt.de" {
     groups = ["freifunk_admins"]
   }
 }
+
+object Host "UniFi Controller" {
+  import "generic-host"
+  address = "10.10.0.10"
+  vars.webpage = ["web-controller"]
+  groups = ["mapserver-docker"]
+  vars.notification["mail"] = {
+    groups = ["freifunk_admins"]
+  }
+  vars.notification["xmpp"] = {
+    groups = ["freifunk_admins"]
+  }
+}
