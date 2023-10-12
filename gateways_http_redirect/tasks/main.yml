@@ -38,3 +38,11 @@
   loop: "{{ find_enabledsites.files }}"
   when: item.path | basename != "redirect"
   notify: restart nginx
+
+- name: Create folder for nginx.service file
+  file: path=/etc/systemd/system/nginx.service.d state=directory mode=0755
+
+- name: Copy nginx.service
+  copy: src=nginx.service dest=/etc/systemd/system/bind9.service.d/override.conf
+  notify:
+    - reread systemd configs
