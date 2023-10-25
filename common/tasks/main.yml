@@ -53,8 +53,6 @@
 - name: Lege Swapfile an
   command:
     cmd: "{{ item }}"
-  args:
-    warn: false
   with_items:
     - dd if=/dev/zero of=/swap.img bs=1M count={{ swap_minimum_mbyte - ansible_swaptotal_mb }}
     - chmod 600 /swap.img
