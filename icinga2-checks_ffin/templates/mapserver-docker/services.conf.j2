@@ -68,8 +68,8 @@ apply Service "web-meshviewer" {
     vars.http_vhost =			host.vars.vhost
     vars.http_ssl =			"true"
     vars.http_uri =			"/"
-    vars.http_pagesize =		"15000"				# min. size of http document in bytes
-    vars.http_string =			"Freifunk Ingolstadt Meshviewer"
+    vars.http_pagesize =		"5000"				# min. size of http document in bytes
+    vars.http_string =			"Meshviewer Knotenkarte"
     assign where host.vars.vhost && "web-meshviewer" in host.vars.webpage
 }
 
