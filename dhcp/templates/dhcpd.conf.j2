@@ -7,11 +7,11 @@ authoritative;
 
 log-facility local7;
 
-subnet {{ff_network.v4_network | ipaddr('network')}} netmask {{ff_network.v4_network | ipaddr('netmask')}} {
+subnet {{ff_network.v4_network | ansible.utils.ipaddr('network')}} netmask {{ff_network.v4_network | ansible.utils.ipaddr('netmask')}} {
     range {{dhcp.range_start}} {{dhcp.range_end}};
 
-    option routers {{ff_network.v4_network | ipaddr(vm_id) | ipaddr('address') }};
-    option domain-name-servers {{ff_network.v4_network | ipaddr(vm_id) | ipaddr('address') }};
+    option routers {{ff_network.v4_network | ansible.utils.ipaddr(vm_id) | ansible.utils.ipaddr('address') }};
+    option domain-name-servers {{ff_network.v4_network | ansible.utils.ipaddr(vm_id) | ansible.utils.ipaddr('address') }};
     option interface-mtu {{dhcp_global.mtu}};
 }
 {% if "static_hosts" in hostvars[inventory_hostname] %}

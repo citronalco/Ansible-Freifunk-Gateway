@@ -17,7 +17,7 @@ server {
         proxy_set_header Host $host;
         proxy_buffering off;
 
-{% if item.value.backend | lower | urlsplit('scheme') == "https" and item.value.backend | lower | urlsplit('hostname') | ipaddr %}
+{% if item.value.backend | lower | urlsplit('scheme') == "https" and item.value.backend | lower | urlsplit('hostname') | ansible.utils.ipaddr %}
         proxy_ssl_verify off;
 
 {% endif %}

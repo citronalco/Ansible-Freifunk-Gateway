@@ -634,9 +634,9 @@ LoadPlugin write_graphite
 {% for host in hosts %}
 {% if hostvars[host] is defined %}
 {% if "domaenenliste" in hostvars[host] %}
-	Host "{{domaenen[domaene[0]].ffv4_network | ipaddr(hostvars[host].domaenenliste[domaene[0]].server_id) | ipaddr('address') }}"
+	Host "{{domaenen[domaene[0]].ffv4_network | ansible.utils.ipaddr(hostvars[host].domaenenliste[domaene[0]].server_id) | ansible.utils.ipaddr('address') }}"
 {% else %}
-	Host "{{domaenen[domaene[0]].ffv4_network | ipaddr(hostvars[host].server_id) | ipaddr('address') }}"
+	Host "{{domaenen[domaene[0]].ffv4_network | ansible.utils.ipaddr(hostvars[host].server_id) | ansible.utils.ipaddr('address') }}"
 {% endif %}
 {% endif %}
 {% endfor %}
@@ -960,7 +960,7 @@ LoadPlugin write_graphite
 <Plugin write_graphite>
 	<Carbon>
 {% if group_names[0].startswith('domaene-') %}
-		Host "{{ff_network.v4_network | ipaddr('11') | ipaddr('address')}}"
+		Host "{{ff_network.v4_network | ansible.utils.ipaddr('11') | ansible.utils.ipaddr('address')}}"
 {% else %}
 		Host "{{collectd.graphite_target.host}}"
 {% endif %}

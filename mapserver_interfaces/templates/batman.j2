@@ -22,11 +22,11 @@ iface bat{{domaene[0]}} inet6 static
 {% endif %}
 {% endfor %}
         post-up batctl -m bat{{domaene[0]}} mm 0
-        post-up ip -6 addr add {{domaene[1].ffv6_network | ipaddr(vm_id) | ipaddr('address')}}/64 dev bat{{domaene[0]}}
+        post-up ip -6 addr add {{domaene[1].ffv6_network | ansible.utils.ipaddr(vm_id) | ansible.utils.ipaddr('address')}}/64 dev bat{{domaene[0]}}
 
 iface bat{{domaene[0]}} inet static
-        address {{domaene[1].ffv4_network | ipaddr(vm_id) | ipaddr('address') }}
-        netmask {{domaene[1].ffv4_network | ipaddr('netmask')}}
+        address {{domaene[1].ffv4_network | ansible.utils.ipaddr(vm_id) | ansible.utils.ipaddr('address') }}
+        netmask {{domaene[1].ffv4_network | ansible.utils.ipaddr('netmask')}}
         post-down ip link del bat{{domaene[0]}}
 
 # Tunnel-Interfaces für Domäne-{{domaene[0]}}
