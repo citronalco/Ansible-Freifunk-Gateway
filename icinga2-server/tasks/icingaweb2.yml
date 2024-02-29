@@ -165,5 +165,10 @@
   template:
     src: "apache2/ports.conf.j2"
     dest: "/etc/apache2/ports.conf"
-  notify: reload apache2
+  register: apache_listening_ports
 
+- name: Reload Apache2 now to avoid interference with later roles
+  service:
+    name: apache2
+    state: reloaded
+  when: apache_listening_ports.changed

@@ -6,7 +6,7 @@
 #CRITICAL=2
 
 #########################################################################
-# Ausgabe von birdc show proto überprüfen, ob OSPF „running“ und alle bgp „established“ sind
+# Ausgabe von birdc show proto Ã¼berprÃ¼fen, ob OSPF "running" und alle bgp "established" sind
 #########################################################################
 
 BGPSTATUSLIST=$(birdc6 show proto | grep BGP | sed -e 's/.* BGP .*[0-9][0-9]* *//g')
