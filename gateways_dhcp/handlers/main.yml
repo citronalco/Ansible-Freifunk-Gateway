@@ -1,4 +1,3 @@
----
 - name: restart isc-dhcp-server
   systemd:
     name: isc-dhcp-server
@@ -6,5 +5,4 @@
 
 - name: reread systemd configs
   systemd:
-    daemon_reload: yes
-
+    daemon_reload: true

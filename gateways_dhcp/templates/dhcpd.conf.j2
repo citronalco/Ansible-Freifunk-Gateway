@@ -1,7 +1,8 @@
 # {{ ansible_managed }}
 
-default-lease-time {{dhcp_global.lease_default}};
-max-lease-time {{dhcp_global.lease_max}};
+adaptive-lease-time-threshold 75;
+default-lease-time {{ dhcp_global.lease_default | default('43200') }};
+max-lease-time {{ dhcp_global.lease_max | default('86400') }};
 
 authoritative;
 
