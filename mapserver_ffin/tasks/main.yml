@@ -1,6 +1,6 @@
 - name: Install required packages
   apt:
-    pkg: [ 'docker-compose', 'docker.io', 'git', 'cifs-utils' ]
+    pkg: [ 'docker-compose', 'docker.io', 'apparmor-utils', 'git', 'cifs-utils' ]
 
 - name: Switch Docker logging to journald
   copy:
