@@ -47,6 +47,23 @@
   set_fact:
     icinga2_ido_db_pw: "{{ icinga2_ido_db_conf_file['content'] | b64decode | regex_findall('password = \"(.+)\"') | first }}"
 
+- name: Preconfigure icinga2-ido-mysql
+  debconf:
+    name: "icinga2-ido-mysql"
+    question: "{{ item.q }}"
+    value: "{{ item.v }}"
+    vtype: "{{ item.t }}"
+  loop:
+    - { q: "icinga2-ido-mysql/enable", v: "true", t: "boolean" }
+    - { q: "icinga2-ido-mysql/pgsql/manualconf", v: "false", t: "boolean" }
+    - { q: "icinga2-ido-mysql/db/dbname", v: "icinga2_ido", t: "string" }
+    - { q: "icinga2-ido-mysql/db/app-user", v: "icinga2_ido@localhost", t: "string" }
+    - { q: "icinga2-ido-mysql/pgsql/app-pass", v: "{{ icinga2_ido_db_pw }}", t: "password" }
+    - { q: "icinga2-ido-mysql/app-password-confirm", v: "{{ icinga2_ido_db_pw }}", t: "password" }
+#  notify:
+#    # FIXME: Fragt immer noch Fragen - und hängt deswegen
+#    dpkg-reconfigure icinga2-ido-mysql
+
 - name: Create IDO database
   mysql_db:
     login_unix_socket: '/run/mysqld/mysqld.sock'
