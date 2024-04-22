@@ -1,0 +1,4 @@
+# Ansible managed
+
+[Journal]
+MaxRetentionSec={{ logrotate.cycle | lower | replace('daily',1) | replace('weekly',7) | replace('monthly',30) | replace('yearly',365) | int * logrotate.count | int }}day

@@ -137,13 +137,20 @@
     path: /etc/systemd/journald.conf
   register: journald_conf
 
-- name: journald-Logging zeitlich beschränken
-  lineinfile:
-    dest: /etc/systemd/journald.conf
-    regexp: "^[#]?MaxRetentionSec"
-    line: "MaxRetentionSec={{ logrotate.cycle | lower | replace('daily',1) | replace('weekly',7) | replace('monthly',30) | replace('yearly',365) | int * logrotate.count | int }}day"
+- name: Lege Verzeichnis an für lokale journald-Konfigurationsänderungen
+  file:
+    path: "/etc/systemd/journald.conf.d"
+    state: directory
+    mode: "0755"
   when: journald_conf.stat.exists
+
+- name: journald-Logging zeitlich beschränken
+  template:
+    src: "journald-override.conf.j2"
+    dest: "/etc/systemd/journald.conf.d/local.conf"
+    mode: "0644"
   notify: restart journald
+  when: journald_conf.stat.exists
 
 - name: vnstat Bandbreiten limit auf 1000 Mbit erhöhen.
   lineinfile:
