@@ -24,5 +24,9 @@ server {
         proxy_pass {{ item.value.backend }};
     }
 
-    access_log /var/log/nginx/access.log anonymized;
+{% if item.value.anonymize | default(True) %}
+    access_log /var/log/nginx/access-{{ item.key.split(":")[0] }}-ssl.log anonymized;
+{% else %}
+    access_log /var/log/nginx/access-{{ item.key.split(":")[0] }}-ssl.log gluon_version;
+{% endif %}
 }

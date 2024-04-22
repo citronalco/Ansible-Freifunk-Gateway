@@ -25,8 +25,8 @@ server {
     }
 
 {% if item.value.anonymize | default(True) %}
-    access_log /var/log/nginx/access.log anonymized;
+    access_log /var/log/nginx/access-{{ item.key.split(":")[0] }}.log anonymized;
 {% else %}
-    access_log /var/log/nginx/access.log;
+    access_log /var/log/nginx/access-{{ item.key.split(":")[0] }}.log gluon_version;
 {% endif %}
 }

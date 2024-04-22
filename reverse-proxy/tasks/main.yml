@@ -7,20 +7,21 @@
     src: "{{ item }}.j2"
     dest: "/etc/nginx/conf.d/{{ item }}"
   loop:
-    - anonymize-ip.conf
+    - log-anonymized.conf
+    - log-gluon_version.conf
     - hardening.conf
   notify: reload nginx
 
-- name: Create default http config
+- name: Create custom default site config
   template:
-    src: default-http.j2
-    dest: /etc/nginx/sites-available/default
+    src: custom-default.j2
+    dest: /etc/nginx/sites-available/custom-default
   notify: reload nginx
 
-- name: Enable default http config
+- name: Enable custom default site config
   file:
-    src: /etc/nginx/sites-available/default
-    dest: /etc/nginx/sites-enabled/default
+    src: /etc/nginx/sites-available/custom-default
+    dest: /etc/nginx/sites-enabled/custom-default
     state: link
   notify: reload nginx
 
@@ -61,7 +62,7 @@
   loop: "{{ find_enabledsites.files }}"
   when: item.path | basename not in (reverse_proxy.http | list | map('regex_replace','^','http_') | list) and
         item.path | basename not in (reverse_proxy.https | list | map('regex_replace','^','https_') | list) and
-        item.path | basename != "default"
+        item.path | basename != "custom-default"
   notify: reload nginx
 
 - name: Create http site configs
