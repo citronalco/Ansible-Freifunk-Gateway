@@ -135,6 +135,28 @@
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
   with_dict: "{{ domaenenliste }}"
 
+- name: create hook directory
+  file:
+    path: /etc/fastd/hooks
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: fastd_on_this_gw is defined and fastd_on_this_gw
+
+- name: copy hook files
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/fastd/hooks/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - common
+    - up
+    - down
+  when: fastd_on_this_gw is defined and fastd_on_this_gw
+
 - name: create verify directory
   file:
     path: /var/freifunk/gateway-{{ freifunk.kurzname }}/fastd/
