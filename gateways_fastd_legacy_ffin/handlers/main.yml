@@ -3,7 +3,7 @@
   systemd:
     name: fastd@{{ item.key }}legacy.service
     state: restarted
-  when: item.value.fastd is defined and item.value.fastd
+  when: item.value.fastd_key is defined
   with_dict: "{{ domaenenliste }}"
 
 - name: reread systemd configs
