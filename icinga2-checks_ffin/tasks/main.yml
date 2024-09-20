@@ -1,3 +1,10 @@
+- name: Gather facts from all gateways
+  ansible.builtin.setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  when: hostvars[item].ansible_devices is not defined
+  loop: "{{ groups['gateways'] }}"
+
 - name: Create configuration directories
   file:
     path: "/etc/icinga2/conf.d/{{ item.path }}"

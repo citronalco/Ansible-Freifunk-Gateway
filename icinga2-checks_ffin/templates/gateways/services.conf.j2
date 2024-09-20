@@ -36,6 +36,15 @@ object Service "Disk" {
   vars.nrpe_command = "check_disk"
 }
 
+{% for device in hostvars[item]['ansible_devices'].keys() | list | select('regex', '(sd[a-z])|(nvme[0-9]+)') %}
+object Service "SMART Status {{ device }}" {
+  import "generic-service"
+  host_name = "{{ item }}"
+  check_command = "nrpe2"
+  vars.nrpe_command = "check_smart_{{ device }}"
+}
+
+{% endfor %}
 object Service "APT Updates" {
   import "generic-service"
   host_name = "{{ item }}"
