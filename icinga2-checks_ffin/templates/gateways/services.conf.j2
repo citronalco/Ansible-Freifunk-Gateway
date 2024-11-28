@@ -37,6 +37,7 @@ object Service "Disk" {
 }
 
 {% for device in hostvars[item]['ansible_devices'].keys() | list | select('regex', '(sd[a-z])|(nvme[0-9]+)') %}
+{% if hostvars[item]['ansible_devices'][device]['model'] != "QEMU HARDDISK" %}
 object Service "SMART Status {{ device }}" {
   import "generic-service"
   host_name = "{{ item }}"
@@ -44,6 +45,7 @@ object Service "SMART Status {{ device }}" {
   vars.nrpe_command = "check_smart_{{ device }}"
 }
 
+{% endif %}
 {% endfor %}
 object Service "APT Updates" {
   import "generic-service"
