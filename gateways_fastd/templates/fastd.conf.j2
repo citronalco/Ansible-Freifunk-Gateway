@@ -20,11 +20,11 @@ mode multitap;
 mtu {{ fastd.mtu|default('1406') }};
 
 # Set the methods (aes128-gcm preferred, salsa2012+umac preferred for nodes)
-method "aes128-gcm";
-method "salsa2012+umac";
-method "salsa2012+gmac";
 method "null@l2tp";
 method "null";
+method "salsa2012+umac";
+method "salsa2012+gmac";
+method "aes128-gcm";
 
 offload l2tp yes;
 persist interface no;
