@@ -1,6 +1,25 @@
 {
 
 "Dhcp4": {
+    "option-def": [
+{% if kea.global.option43_unifi_ip is defined and kea.global.option43_unifi_ip %}
+      {
+        "name": "vendor-encapsulated-options",
+        "space": "vendor-encapsulated-options-space",
+        "code": 43,
+        "type": "string",
+        "array": false
+      },
+{% endif %}
+      {
+        "name": "dns-search-list",
+        "space": "dns-search-list-space",
+        "code": 119,
+        "type": "fqdn",
+        "array": true
+      }
+    ],
+
     "interfaces-config": {
         "interfaces": [ {% for domaene in domaenenliste|dictsort %}"bat{{domaene[0]}}"{% if not loop.last %}, {% endif %}{% endfor %} ]
     },
@@ -26,6 +45,14 @@
         "valid-lifetime": {{kea.global.lease_default}},
 
         "option-data": [
+{% if kea.global.option43_unifi_ip is defined and kea.global.option43_unifi_ip %}
+            {
+                "name": "vendor-encapsulated-options",
+                "space": "vendor-encapsulated-options-space",
+                "code": 43,
+                "data": "01:04:{{ kea.global.option43_unifi_ip | ansible.utils.ip4_hex(':') }}"
+            },
+{% endif %}
             {
                 "name": "interface-mtu",
                 "code": 26,
@@ -76,6 +103,11 @@
                         "space": "dhcp4",
                         "csv-format": true,
                         "data": "{{kea.global.search_domain}}"
+                    },
+                    {
+                        "name": "dns-search-list",
+                        "data": "{{ kea.global.dns_search_list | join(', ') }}",
+                        "space": "dns-search-list-space"
                     }
                 ]
             }{% if not loop.last %},{% endif %}
