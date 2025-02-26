@@ -42,6 +42,20 @@ object Host "map.freifunk-ingolstadt.de" {
   }
 }
 
+object Host "map.freifunk-altmuehljura.de" {
+  import "generic-host"
+  address = "94.130.149.86"
+  vars.vhost = "map.freifunk-altmuehljura.de"
+  vars.webpage = ["web-meshviewer"]
+  groups = ["mapserver-docker"]
+  vars.notification["mail"] = {
+    groups = ["freifunk_admins"]
+  }
+  vars.notification["xmpp"] = {
+    groups = ["freifunk_admins"]
+  }
+}
+
 object Host "grafana.freifunk-ingolstadt.de" {
   import "generic-host"
   address = "94.130.149.86"
