@@ -8,6 +8,7 @@ zone "{{domain}}." IN {
 	   {{hostvars[host].ipv4 }};
 {% endfor %}
 	};
+	notify yes;
 };
 zone "servers.{{domain}}." IN {
 	type master;
@@ -18,6 +19,7 @@ zone "servers.{{domain}}." IN {
            {{hostvars[host].ipv4 }};
 {% endfor %}
 	};
+	notify yes;
 };
 zone "backdoor.{{domain}}." IN {
 	type master;
@@ -28,6 +30,7 @@ zone "backdoor.{{domain}}." IN {
            {{hostvars[host].ipv4 }};
 {% endfor %}
 	};
+	notify yes;
 };
 zone "services.{{domain}}." IN {
 	type master;
@@ -38,6 +41,7 @@ zone "services.{{domain}}." IN {
            {{hostvars[host].ipv4 }};
 {% endfor %}
 	};
+	notify yes;
 };
 zone "knoten.{{domain}}." IN {
 	type master;
@@ -48,6 +52,7 @@ zone "knoten.{{domain}}." IN {
            {{hostvars[host].ipv4 }};
 {% endfor %}
 	};
+	notify yes;
 };
 {% if additional_subzones_for_all_tlds is defined %}
 {% for subzone in additional_subzones_for_all_tlds %}
@@ -60,6 +65,7 @@ zone "{{subzone}}.{{domain}}." IN {
 	   {{hostvars[host].ipv4 }};
 {% endfor %}
 	};
+	notify yes;
 };
 {% endfor %}
 {% endif %}
@@ -74,5 +80,6 @@ zone "{{ zone }}." IN {
            {{hostvars[host].ipv4 }};
 {% endfor %}
         };
+	notify yes;
 };
 {% endfor %}
