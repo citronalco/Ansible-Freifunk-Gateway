@@ -15,3 +15,21 @@
     update_cache: yes
     cache_valid_time: 1800
     state: present
+
+- name: Create systemd override directory for isc-kea-dhcp4-server
+  file:
+    path: /etc/systemd/system/isc-kea-dhcp4-server.service.d
+    state: directory
+    mode: '0755'
+
+- name: Configure systemd override to restart isc-kea-dhcp4-server on failure
+  copy:
+    dest: /etc/systemd/system/isc-kea-dhcp4-server.service.d/override.conf
+    content: |
+      [Service]
+      Restart=on-failure
+      RestartSec=10
+    mode: '0644'
+  notify:
+    - Reload systemd
+    - Restart isc-kea-dhcp4-server
