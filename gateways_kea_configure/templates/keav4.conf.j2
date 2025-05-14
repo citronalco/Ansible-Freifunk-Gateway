@@ -1,6 +1,18 @@
 {
 
 "Dhcp4": {
+    "loggers": [
+      {
+        "name": "kea-dhcp4",
+        "output_options": [
+          {
+            "output": "stdout"
+          }
+        ],
+        "severity": "warn"
+      }
+    ],
+
     "option-def": [
 {% if kea.global.option43_unifi_ip is defined and kea.global.option43_unifi_ip %}
       {
