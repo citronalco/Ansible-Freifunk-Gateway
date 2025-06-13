@@ -1,28 +1,50 @@
 {
 
 "Dhcp4": {
+    "loggers": [
+      {
+        "name": "kea-dhcp4",
+        "output_options": [
+          {
+            "output": "stdout"
+          }
+        ],
+        "severity": "warn"
+      }
+    ],
+
+    "option-def": [
+{% if kea.global.option43_unifi_ip is defined and kea.global.option43_unifi_ip %}
+      {
+        "name": "vendor-encapsulated-options",
+        "space": "vendor-encapsulated-options-space",
+        "code": 43,
+        "type": "string",
+        "array": false
+      },
+{% endif %}
+      {
+        "name": "dns-search-list",
+        "space": "dns-search-list-space",
+        "code": 119,
+        "type": "fqdn",
+        "array": true
+      }
+    ],
+
     "interfaces-config": {
         "interfaces": [ {% for domaene in domaenenliste|dictsort %}"bat{{domaene[0]}}"{% if not loop.last %}, {% endif %}{% endfor %} ]
     },
 
     "control-socket": {
         "socket-type": "unix",
-        "socket-name": "/var/kea/control.sock"
+        "socket-name": "/tmp/kea4-ctrl-socket"
     },
 
     "lease-database": {
-{% if kea.database.type == "memfile" %}
         "type": "memfile",
-        "persist": {{kea.database.persistent | lower}},
-        "name": "{{kea.database.location}}",
-        "lfc-interval": {{kea.database.lfc_interval}}
-{% elif kea.database.type == "postgresql" %}
-        "type": "postgresql",
-        "name": "{{kea.database.db_name}}",
-        "user": "{{kea.database.db_user}}",
-        "password": "{{kea.database.db_pass}}",
-        "host": "{{kea.database.db_host}}"
-{% endif %}
+        "lfc-interval": 3600,
+        "name": "/var/lib/kea/kea-leases4.csv"
     },
 
     "expired-leases-processing": {
@@ -35,6 +57,14 @@
         "valid-lifetime": {{kea.global.lease_default}},
 
         "option-data": [
+{% if kea.global.option43_unifi_ip is defined and kea.global.option43_unifi_ip %}
+            {
+                "name": "vendor-encapsulated-options",
+                "space": "vendor-encapsulated-options-space",
+                "code": 43,
+                "data": "01:04:{{ kea.global.option43_unifi_ip | ansible.utils.ip4_hex(':') }}"
+            },
+{% endif %}
             {
                 "name": "interface-mtu",
                 "code": 26,
@@ -85,25 +115,15 @@
                         "space": "dhcp4",
                         "csv-format": true,
                         "data": "{{kea.global.search_domain}}"
+                    },
+                    {
+                        "name": "dns-search-list",
+                        "data": "{{ kea.global.dns_search_list | join(', ') }}",
+                        "space": "dns-search-list-space"
                     }
                 ]
             }{% if not loop.last %},{% endif %}
 {% endfor %}
         ]
     },
-
-    "Logging": {
-        "loggers": [
-{% for logger in kea.loggers %}
-            {
-                "name": "{{logger.name}}",
-                "output_options": [ {
-                    "output": "{{logger.file}}"
-                } ],
-                "severity": "{{logger.level}}"
-            }{% if not loop.last %},{% endif %}
-
-{% endfor %}
-        ]
-    }
 }
