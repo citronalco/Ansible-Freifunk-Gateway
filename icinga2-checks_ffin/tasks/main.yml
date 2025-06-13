@@ -9,6 +9,9 @@
   file:
     path: "/etc/icinga2/conf.d/{{ item.path }}"
     state: directory
+    owner: "nagios"
+    group: "nagios"
+    mode: "0640"
   with_filetree: "templates/"
   when: item.state == "directory"
   tags:
@@ -18,6 +21,9 @@
   template:
     src: "{{ item.src }}"
     dest: "/etc/icinga2/conf.d/{{ item.path|regex_replace('.j2','') }}"
+    owner: "nagios"
+    group: "nagios"
+    mode: "0640"
   with_filetree: "templates/"
   when: item.state == "file"
   notify: reload icinga2

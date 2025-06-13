@@ -8,16 +8,16 @@
     /bin/ls /etc/systemd/system/multi-user.target.wants/iperf3@* | grep -oE "[0-9]+"
   args:
     executable: bash
-  changed_when: False
-  failed_when: False
-  check_mode: no
+  changed_when: false
+  failed_when: false
+  check_mode: false
   register: _iperf3_domain_instances
   when: domaenenliste is defined
 
 - name: Stop and disable obsolete iperf3 instances
   service:
     name: "iperf3@{{ item }}.service"
-    enabled: no
+    enabled: false
     state: stopped
   with_items: "{{ _iperf3_domain_instances.stdout_lines }}"
   when: domaenenliste is defined and item not in domaenenliste
@@ -26,6 +26,7 @@
   copy:
     src: iperf3@.service
     dest: /etc/systemd/system/iperf3@.service
+    mode: "0644"
   register: _domain_iperf3_systemd
   notify:
     - restart iperf3 per domain
@@ -34,7 +35,7 @@
 
 - name: reload systemd
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
   when:
     - domaenenliste is defined
     - _domain_iperf3_systemd.changed
@@ -42,7 +43,7 @@
 - name: enable all iperf3 instances
   systemd:
     name: "iperf3@{{ item }}.service"
-    enabled: yes
+    enabled: true
   loop: "{{ domaenenliste | list }}"
   when:
     - domaenenliste is defined

@@ -1,11 +1,12 @@
 - name: Install nginx-light
   apt:
-    pkg: [ 'nginx-light' ]
+    pkg: ['nginx-light']
 
 - name: Copy Nginx config files
   template:
     src: "{{ item }}.j2"
     dest: "/etc/nginx/conf.d/{{ item }}"
+    mode: "0644"
   loop:
     - anonymize-ip.conf
     - hardening.conf
@@ -15,6 +16,7 @@
   template:
     src: redirect.j2
     dest: /etc/nginx/sites-available/redirect
+    mode: "0644"
   notify: restart nginx
 
 - name: Enable http config
@@ -40,9 +42,15 @@
   notify: restart nginx
 
 - name: Create folder for nginx.service file
-  file: path=/etc/systemd/system/nginx.service.d state=directory mode=0755
+  file:
+    path: /etc/systemd/system/nginx.service.d
+    state: directory
+    mode: "0755"
 
 - name: Copy nginx.service
-  copy: src=nginx.service dest=/etc/systemd/system/bind9.service.d/override.conf
+  copy:
+    src: nginx.service
+    dest: /etc/systemd/system/bind9.service.d/override.conf
+    mode: "0644"
   notify:
     - reread systemd configs

@@ -1,11 +1,12 @@
 - name: Install nginx and certbot
   apt:
-    pkg: [ 'python3-certbot-nginx', 'nginx' ]
+    pkg: ['python3-certbot-nginx', 'nginx']
 
 - name: Copy Nginx config files
   template:
     src: "{{ item }}.j2"
     dest: "/etc/nginx/conf.d/{{ item }}"
+    mode: "0644"
   loop:
     - log-anonymized.conf
     - log-gluon_version.conf
@@ -16,6 +17,7 @@
   template:
     src: custom-default.j2
     dest: /etc/nginx/sites-available/custom-default
+    mode: "0644"
   notify: reload nginx
 
 - name: Enable custom default site config
@@ -38,7 +40,9 @@
   when: letsencrypt_cert.results | selectattr('stat.exists','equalto', false) | list | count > 0
 
 - name: Create certificates
-  command: "/usr/bin/certbot certonly --non-interactive --nginx --agree-tos --email {{ freifunk.email }} {{ [ '-d ' ] | product( [ item.key.split(':')[0] + '.' + freifunk.domain ] + item.value.aliases | default([]) ) | map('join') | join(' ') }}"
+  command: "/usr/bin/certbot certonly --non-interactive --nginx --agree-tos --email \
+            {{ freifunk.email }} {{ ['-d '] | product([item.key.split(':')[0] + '.' + freifunk.domain] + item.value.aliases | default([])) |
+            map('join') | join(' ') }}"
   args:
     creates: /etc/letsencrypt/live/{{ item.key.split(":")[0] }}.{{ freifunk.domain }}/cert.pem
   loop: '{{ reverse_proxy.https | dict2items }}'
@@ -69,6 +73,7 @@
   template:
     src: reverse-proxy-http.j2
     dest: /etc/nginx/sites-available/http_{{ item.key }}
+    mode: "0644"
   loop: '{{ reverse_proxy.http | dict2items }}'
   notify: reload nginx
 
@@ -85,6 +90,7 @@
   template:
     src: reverse-proxy-https.j2
     dest: /etc/nginx/sites-available/https_{{ item.key }}
+    mode: "0644"
   loop: '{{ reverse_proxy.https | dict2items }}'
   notify: reload nginx
 
