@@ -1,4 +1,6 @@
 #!/usr/bin/perl -w
+# Ansible managed
+
 use strict;
 use IO::Socket::UNIX qw( SOCK_STREAM );
 $ARGV[0] or die("Usage: status.pl <socket>\n");
