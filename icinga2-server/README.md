@@ -52,6 +52,3 @@ Der dritte User kann sich nirgends anmelden und wird nur per E-Mail über Alerts
 Auf die API kann, wenn nicht anders konfiguriert, über https, Port 5665, zugegriffen werden.
 Das von Icinga2 dafür erzeugte CA-Zertifikat wird auf dem Ansible-Controller unter "keyfiles/icinga2/HOSTNAME-ca.crt" abgelegt.
 Auf IcingaWeb2 kann, wenn nicht anders konfiguriert, über http, Port 80, zugegriffen werden.
-
-## Kompatibilität:
-Nur Debian 10 und Ubuntu 18.04.
