@@ -7,7 +7,9 @@ table ffnet;
 
 filter freifunk {
 	if net ~ {{ff_network.v6_network}} then accept;
+{% if ff_network.v6_new_network is defined %}
 	if net ~ {{ff_network.v6_new_network}} then accept;
+{% endif %}
 {% if ffrl_tun is not defined and ffi_tun is not defined %}
 	if net ~ [::/0] then accept;
 {% endif %}
@@ -35,7 +37,7 @@ protocol radv {
 		link mtu 1280;
 		prefix {{domaenen[domaene[0]].ffv6_network}} {
 		};
-{% for v6_ad_network in domaenen[domaene[0]].ffv6_additional_networks %}
+{% for v6_ad_network in domaenen[domaene[0]].ffv6_additional_networks | default([]) %}
 		#prefix {{ v6_ad_network }} {
 		#};
 {% endfor %}
@@ -96,6 +98,7 @@ filter export_to_upstream_filter {
 	reject;
 };
 
+{% if ff_network.v6_new_network is defined %}
 filter export_to_upstream_filter_ffi {
 	if source = RTS_STATIC then {
 		if net ~ [{{ff_network.v6_new_network}}+] then accept;
@@ -103,10 +106,13 @@ filter export_to_upstream_filter_ffi {
 	reject;
 };
 
+{% endif %}
 protocol static static_Gesamtnetzwerk {
 	table ffnet;
 	route {{ff_network.v6_network}} reject;
+{% if ff_network.v6_new_network is defined %}
 	route {{ff_network.v6_new_network}} reject;
+{% endif %}
 };
 
 {% if domaenenliste is defined %}
@@ -114,7 +120,7 @@ protocol static static_Gesamtnetzwerk {
 protocol static static_domaene{{domaene[0]}} {
 	table ffnet;
 	route {{domaenen[domaene[0]].ffv6_network | regex_replace('..::/\d+$','00::/56')}} reject;
-{% for v6_ad_network in domaenen[domaene[0]].ffv6_additional_networks %}
+{% for v6_ad_network in domaenen[domaene[0]].ffv6_additional_networks | default([]) %}
 	route {{ v6_ad_network }} reject;
 {% endfor %}
 };
@@ -205,6 +211,7 @@ template bgp uplink {
 	gateway recursive;
 }
 
+{% if ffi_tun is defined %}
 template bgp uplink_ffi {
 	table ffnet;
 	local as {{ff_network.as_number}};
@@ -213,6 +220,7 @@ template bgp uplink_ffi {
 	gateway recursive;
 	next hop self;
 }
+{% endif %}
 {% if ffrl_tun is defined %}
 
 {% for tun in ffrl_tun %}
