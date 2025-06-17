@@ -1,0 +1,9 @@
+- name: reload sshd
+  systemd:
+    name: ssh
+    state: reloaded
+
+- name: restart journald
+  systemd:
+    name: systemd-journald
+    state: restarted

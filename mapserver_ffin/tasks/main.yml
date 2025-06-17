@@ -1,11 +1,12 @@
 - name: Install required packages
   apt:
-    pkg: [ 'docker-compose', 'docker.io', 'apparmor-utils', 'git', 'cifs-utils' ]
+    pkg: ['docker-compose', 'docker.io', 'apparmor-utils', 'git', 'cifs-utils']
 
 - name: Switch Docker logging to journald
   copy:
     src: "docker-daemon.json"
     dest: "/etc/docker/daemon.json"
+    mode: "0644"
   notify: restart docker
 
 - name: Mount firmware images
@@ -26,6 +27,7 @@
   template:
     src: "{{ item }}.j2"
     dest: "/opt/mapserver-docker/{{ item }}"
+    mode: "0640"
   loop:
     - influxdb-admin-credentials.env
     - influxdb-write-credentials.env

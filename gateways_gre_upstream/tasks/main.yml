@@ -1,23 +1,36 @@
 ---
 - name: let read interfaces from interfaces
-  lineinfile: dest="/etc/network/interfaces" line="source /etc/network/interfaces.d/*"
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    line: "source /etc/network/interfaces.d/*"
   notify:
     - restart networking
 
 - name: Konfig für die lo-Schnittstelle
-  template: src="lo.j2" dest="/etc/network/interfaces.d/00_lo.cfg"
+  template:
+    src: "lo.j2"
+    dest: "/etc/network/interfaces.d/00_lo.cfg"
+    mode: "0644"
   notify:
     - restart networking
 
 - name: lo-Block aus interfaces entfernen
-  lineinfile: dest="/etc/network/interfaces" line="auto lo" state="absent"
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    line: "auto lo"
+    state: "absent"
 
 - name: lo-Block aus interfaces entfernen
-  lineinfile: dest="/etc/network/interfaces" line="iface lo inet loopback" state="absent"
+  lineinfile:
+    dest: "/etc/network/interfaces"
+    line: "iface lo inet loopback"
+    state: "absent"
 
 - name: Create interfaces - gretap to ffrl or ffnw
-  template: src="gre_upstream.j2" dest="/etc/network/interfaces.d/40_gre_upstream.cfg"
+  template:
+    src: "gre_upstream.j2"
+    dest: "/etc/network/interfaces.d/40_gre_upstream.cfg"
+    mode: "0644"
   notify:
     - restart networking
-  when: ffrl_tun is defined or ffnw_tun is defined
-
+  when: ffrl_tun is defined or ffnw_tun or ffi_tun is defined

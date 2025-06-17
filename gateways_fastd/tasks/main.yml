@@ -3,14 +3,14 @@
 
 - name: check if fastd needs to be installed
   set_fact:
-     fastd_on_this_gw: true
+    fastd_on_this_gw: true
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
   with_dict: "{{ domaenenliste }}"
 
 - name: install fastd (vpn daemon) and haveged (entropy daemon)
   apt:
     pkg: ['fastd', 'haveged']
-    update_cache: yes
+    update_cache: true
     state: present
   when: fastd_on_this_gw is defined and fastd_on_this_gw
 
@@ -20,15 +20,15 @@
     /bin/ls -1 /etc/systemd/system/multi-user.target.wants/fastd@* | sed -n 's/fastd@\([0-9][0-9]*\)\.service/\1/p'
   args:
     executable: bash
-  changed_when: False
-  failed_when: False
-  check_mode: no
+  changed_when: false
+  failed_when: false
+  check_mode: false
   register: _fastd_domain_instances
 
 - name: Stop and disable obsolete fastd instances
   service:
     name: "fastd@{{ item }}.service"
-    enabled: no
+    enabled: false
     state: stopped
   with_items: "{{ _fastd_domain_instances.stdout_lines }}"
   when: domaenenliste is defined and item not in domaenenliste or
@@ -45,6 +45,7 @@
   file:
     path: /etc/fastd/{{ item.key }}
     state: directory
+    mode: "0755"
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
   with_dict: "{{ domaenenliste }}"
 
@@ -52,6 +53,7 @@
   file:
     path: /etc/fastd/{{ item.key }}/keys
     state: directory
+    mode: "0755"
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
   with_dict: "{{ domaenenliste }}"
 
@@ -61,7 +63,7 @@
     dest: /etc/fastd/{{ item.key }}/keys/secret.key
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
   when: item.value.fastd_key is defined and not (item.value.fastd is defined and not item.value.fastd)
   vars:
     secretkey: "{{ item.value.fastd_key.secret }}"
@@ -71,6 +73,7 @@
   template:
     src: public.key.j2
     dest: /etc/fastd/{{ item.key }}/keys/public.key
+    mode: "0644"
   when: item.value.fastd_key is defined and not (item.value.fastd is defined and not item.value.fastd)
   vars:
     publickey: "{{ item.value.fastd_key.public }}"
@@ -85,7 +88,7 @@
     creates: /etc/fastd/{{ item.key }}/keys/secret.key
   when: (item.value.fastd is defined and item.value.fastd) and item.value.fastd_key is undefined
   with_dict: "{{ domaenenliste }}"
-  check_mode: no
+  check_mode: false
   notify:
     - restart fastd per domain
 
@@ -95,25 +98,27 @@
     dest: /etc/fastd/{{ item.item.key }}/keys/secret.key
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
   when: item.changed
   vars:
-    secretkey: "{{ item.stdout_lines[0]|replace('Secret: ','') }}"
+    secretkey: "{{ item.stdout_lines[0] | replace('Secret: ', '') }}"
   with_items: "{{ fastd_key_generated.results }}"
 
 - name: write public private key to seperate keyfiles, if new fastd key is generated
   template:
     src: public.key.j2
     dest: /etc/fastd/{{ item.item.key }}/keys/public.key
+    mode: "0644"
   when: item.changed
   vars:
-    publickey: "{{ item.stdout_lines[1]|replace('Public: ','') }}"
+    publickey: "{{ item.stdout_lines[1] | replace('Public: ', '') }}"
   with_items: "{{ fastd_key_generated.results }}"
 
 - name: create dummy peer directory
   file:
     path: /etc/fastd/{{ item.key }}/peers
     state: directory
+    mode: "0755"
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
   with_dict: "{{ domaenenliste }}"
 
@@ -122,6 +127,7 @@
   template:
     src: dummy.j2
     dest: /etc/fastd/{{ item.key }}/peers/dummy
+    mode: "0644"
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
   with_dict: "{{ domaenenliste }}"
 
@@ -130,6 +136,7 @@
   template:
     src: fastd.conf.j2
     dest: /etc/fastd/{{ item.key }}/fastd.conf
+    mode: "0644"
   notify:
     - restart fastd per domain
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
@@ -141,7 +148,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when: fastd_on_this_gw is defined and fastd_on_this_gw
 
 - name: copy hook files
@@ -150,7 +157,7 @@
     dest: "/etc/fastd/hooks/{{ item }}"
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   loop:
     - common
     - up
@@ -161,12 +168,14 @@
   file:
     path: /var/freifunk/gateway-{{ freifunk.kurzname }}/fastd/
     state: directory
+    mode: "0755"
   when: fastd_on_this_gw is defined and fastd_on_this_gw
 
 - name: create verify script (blacklisting)
   template:
     src: blacklist.sh.j2
     dest: /var/freifunk/gateway-{{ freifunk.kurzname }}/fastd/blacklist.sh
+    mode: "0755"
   when: fastd_on_this_gw is defined and fastd_on_this_gw
 
 - name: check if global blacklist exists
@@ -178,6 +187,7 @@
   file:
     path: /var/freifunk/gateway-{{ freifunk.kurzname }}/fastd/blacklist
     state: touch
+    mode: "0644"
   when: not blacklist_file.stat.exists and fastd_on_this_gw is defined and fastd_on_this_gw
 
 - name: status.pl nach /root kopieren
@@ -186,20 +196,21 @@
     dest: /root/status.pl
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when: fastd_on_this_gw is defined and fastd_on_this_gw
 
 - name: create folder for fastd@ service file
   file:
     path: /etc/systemd/system/fastd@.service.d
     state: directory
-    mode: 0755
+    mode: "0755"
   when: fastd_on_this_gw is defined and fastd_on_this_gw
 
 - name: override fastd@ service
   template:
     src: fastd@.service.override.j2
     dest: /etc/systemd/system/fastd@.service.d/ansible-managed.conf
+    mode: "0644"
   register: _domain_fastd_systemd
   when: fastd_on_this_gw is defined and fastd_on_this_gw
   notify:
@@ -209,13 +220,14 @@
   file:
     path: /etc/systemd/system/haveged.service.d
     state: directory
-    mode: 0755
+    mode: "0755"
   when: fastd_on_this_gw is defined and fastd_on_this_gw
 
 - name: override haveged service
   template:
     src: haveged.service.override.j2
     dest: /etc/systemd/system/haveged.service.d/ansible-managed.conf
+    mode: "0644"
   register: _domain_fastd_systemd
   when: fastd_on_this_gw is defined and fastd_on_this_gw
   notify:
@@ -224,8 +236,8 @@
 - name: enable fastd for each domain
   systemd:
     name: fastd@{{ item.key }}
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   when: (item.value.fastd is defined and item.value.fastd) or (item.value.fastd is undefined and item.value.fastd_key is defined)
   with_dict: "{{ domaenenliste }}"
   notify:

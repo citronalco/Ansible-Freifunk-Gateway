@@ -7,7 +7,10 @@ table ffnet;
 
 filter freifunk {
 	if net ~ {{ff_network.v6_network}} then accept;
-{% if not ffrl_tun is defined %}
+{% if ff_network.v6_new_network is defined %}
+	if net ~ {{ff_network.v6_new_network}} then accept;
+{% endif %}
+{% if ffrl_tun is not defined and ffi_tun is not defined %}
 	if net ~ [::/0] then accept;
 {% endif %}
 	reject;
@@ -23,6 +26,9 @@ protocol kernel {
 	persist;
 };
 
+table radv_routes;                      # Manually configured routes go here
+
+
 {% if domaenenliste is defined %}
 protocol radv {
 {% for domaene in domaenenliste|dictsort %}
@@ -31,6 +37,10 @@ protocol radv {
 		link mtu 1280;
 		prefix {{domaenen[domaene[0]].ffv6_network}} {
 		};
+{% for v6_ad_network in domaenen[domaene[0]].ffv6_additional_networks | default([]) %}
+		#prefix {{ v6_ad_network }} {
+		#};
+{% endfor %}
 		rdnss {
 			ns {{domaenen[domaene[0]].ffv6_network | ansible.utils.ipaddr(domaene[1].server_id) | ansible.utils.ipaddr('address') }};
 		};
@@ -69,7 +79,7 @@ protocol ospf {
 {% endif %}
 {% endfor %}
 		interface "bck-*";
-{% if ffrl_tun is defined %}
+{% if ffrl_tun or ffi_tun is defined %}
 		interface "lo" {
 			stub;
 		};
@@ -82,13 +92,27 @@ function is_default() {
 };
 
 filter export_to_upstream_filter {
-	if source = RTS_STATIC then accept;
+	if source = RTS_STATIC then {
+		if net ~ {{ff_network.v6_network}} then accept;
+        }
 	reject;
 };
 
+{% if ff_network.v6_new_network is defined %}
+filter export_to_upstream_filter_ffi {
+	if source = RTS_STATIC then {
+		if net ~ [{{ff_network.v6_new_network}}+] then accept;
+	}
+	reject;
+};
+
+{% endif %}
 protocol static static_Gesamtnetzwerk {
 	table ffnet;
 	route {{ff_network.v6_network}} reject;
+{% if ff_network.v6_new_network is defined %}
+	route {{ff_network.v6_new_network}} reject;
+{% endif %}
 };
 
 {% if domaenenliste is defined %}
@@ -96,6 +120,9 @@ protocol static static_Gesamtnetzwerk {
 protocol static static_domaene{{domaene[0]}} {
 	table ffnet;
 	route {{domaenen[domaene[0]].ffv6_network | regex_replace('..::/\d+$','00::/56')}} reject;
+{% for v6_ad_network in domaenen[domaene[0]].ffv6_additional_networks | default([]) %}
+	route {{ v6_ad_network }} reject;
+{% endfor %}
 };
 {% endfor %}
 {% endif %}
@@ -125,6 +152,9 @@ protocol direct {
 	interface "lo";
 {% if ffrl_tun is defined %}
 	interface "tun-ffrl*";
+{% endif %}
+{% if ffi_tun is defined %}
+        interface "tun-ffi*";
 {% endif %}
 	interface "gre-*";
 	interface "bck-*";
@@ -180,6 +210,17 @@ template bgp uplink {
 	export filter export_to_upstream_filter;
 	gateway recursive;
 }
+
+{% if ffi_tun is defined %}
+template bgp uplink_ffi {
+	table ffnet;
+	local as {{ff_network.as_number}};
+	import where is_default();
+	export filter export_to_upstream_filter_ffi;
+	gateway recursive;
+	next hop self;
+}
+{% endif %}
 {% if ffrl_tun is defined %}
 
 {% for tun in ffrl_tun %}
@@ -192,17 +233,12 @@ protocol bgp ffrl_{{tun.name}} from uplink {
 {% endfor %}
 {% endif %}
 
-{% if ffnw_tun is defined %}
-{% for tun in ffnw_tun %}
-protocol bgp ffnw_{{tun.name}} from uplink {
-        description "Nordwest Backbone";
-        neighbor {{tun.v6_remote | ansible.utils.ipaddr('address')}}%'tun-ffnw-{{tun.name}}' as 206313;
-	import filter {
-		reject;
-	};
-	export filter {
-		reject;
-	};
+{% if ffi_tun is defined %}
+{% for tun in ffi_tun %}
+protocol bgp ffi_{{tun.name|replace('-','_')}} from uplink_ffi {
+        description "FFI Backbone";
+	source address {{ tun.v6_remote | ansible.utils.next_nth_usable(1) }};
+        neighbor {{tun.v6_remote | ansible.utils.ipaddr('address')}} as 209894;
 };
 
 {% endfor %}
