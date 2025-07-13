@@ -1,0 +1,78 @@
+- name: Install packages
+  apt:
+    name: [ "graphite-carbon", "graphite-web" ]
+    update_cache: yes
+
+- name: Set up Carbon storage-schemas.conf
+  copy:
+    src: 'carbon/storage-schemas.conf'
+    dest: '/etc/carbon/storage-schemas.conf'
+    mode: "0644"
+  notify:
+    - whisper-resize
+    - restart carbon-cache
+
+- name: Set up storage-aggregation.conf
+  copy:
+    src: 'carbon/storage-aggregation.conf'
+    dest: '/etc/carbon/storage-aggregation.conf'
+    mode: "0644"
+  notify:
+    - whisper-resize
+    - restart carbon-cache
+
+- name: Limit carbon-cache LINE_RECEIVER_INTERFACE to 127.0.0.1
+  lineinfile:
+    path: "/etc/carbon/carbon.conf"
+    regexp: '^LINE_RECEIVER_INTERFACE\s*='
+    line: 'LINE_RECEIVER_INTERFACE = 127.0.0.1'
+  notify: restart carbon-cache
+
+- name: Limit carbon-cache CACHE_QUERY_INTERFACE to 127.0.0.1
+  lineinfile:
+    path: "/etc/carbon/carbon.conf"
+    regexp: '^CACHE_QUERY_INTERFACE\s*='
+    line: 'CACHE_QUERY_INTERFACE = 127.0.0.1'
+  notify: restart carbon-cache
+
+- name: Disable carbon-cache PICKLE_RECEIVER_PORT
+  lineinfile:
+    path: '/etc/carbon/carbon.conf'
+    regexp: '^PICKLE_RECEIVER_PORT\s*='
+    line: 'PICKLE_RECEIVER_PORT = 0'
+  notify: restart carbon-cache
+
+- name: Configure Graphite - set SECRET_KEY
+  lineinfile:
+    path: '/etc/graphite/local_settings.py'
+    regexp: '^SECRET_KEY\*s='
+    line: "SECRET_KEY = 'CHANGED_TO_AVOID_WARNING'"
+  notify: restart apache2
+
+- name: Configure Graphite - set TIME_ZONE
+  lineinfile:
+    path: '/etc/graphite/local_settings.py'
+    regexp: '^TIME_ZONE\*s='
+    line: "TIME_ZONE = 'Europe/Berlin'"
+  notify: restart apache2
+
+- name: Enable graphite-web site in Apache2
+  copy:
+    src: "apache2/site-graphite.conf"
+    dest: "/etc/apache2/sites-enabled/graphite.conf"
+    mode: "0644"
+  notify: reload apache2
+
+- name: Fix for https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=995461
+  lineinfile:
+    path: '/usr/share/graphite-web/graphite.wsgi'
+    regexp: "os.environ.setdefault\\('GRAPHITE_SETTINGS_MODULE', 'graphite.local_settings'\\)  # noqa"
+    line: "os.environ.setdefault('GRAPHITE_SETTINGS_MODULE', 'local_settings')  # noqa"
+  notify: restart apache2
+
+- name: Enable graphite in Icinga2
+  file:
+    src: '/etc/icinga2/features-available/graphite.conf'
+    dest: '/etc/icinga2/features-enabled/graphite.conf'
+    state: link
+  notify: reload icinga2

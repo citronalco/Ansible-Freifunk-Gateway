@@ -1,0 +1,42 @@
+- name: Install IcingaWeb2 graphite module
+  apt:
+    name: 'icingaweb2-module-graphite'
+    install_recommends: false
+
+- name: Fix for https://github.com/Icinga/icingaweb2-module-graphite/issues/301
+  lineinfile:
+    path: "/usr/share/icingaweb2/modules/graphite/library/Graphite/Web/Controller/MonitoringAwareController.php"
+    insertafter: "    protected \\$useIcingadbAsBackend = false;"
+    line: "    protected $backend = null;"
+
+- name: Create directory for IcingaWeb2 graphite module configuration
+  file:
+    path: '/etc/icingaweb2/modules/graphite'
+    state: directory
+    owner: 'www-data'
+    group: 'icingaweb2'
+    mode: '2750'
+
+- name: Configure IcingaWeb2 graphite module
+  copy:
+    src: 'icingaweb2/modules/graphite/config.ini'
+    dest: '/etc/icingaweb2/modules/graphite/config.ini'
+    owner: 'www-data'
+    group: 'icingaweb2'
+    mode: '0660'
+    directory_mode: '2770'
+
+- name: Create enabledModules directory
+  file:
+    path: '/etc/icingaweb2/enabledModules'
+    state: directory
+    owner: 'www-data'
+    group: 'icingaweb2'
+    mode: '2750'
+
+- name: Enable IcingaWeb2 graphite module
+  file:
+    src: '/usr/share/icingaweb2/modules/graphite'
+    dest: '/etc/icingaweb2/enabledModules/graphite'
+    state: link
+    group: 'icingaweb2'

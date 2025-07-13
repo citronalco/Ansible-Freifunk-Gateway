@@ -6,7 +6,7 @@
 ### IcingaWeb2
 - name: Install IcingaWeb2
   apt:
-    pkg: ['icingaweb2', 'apache2', 'php-mysql', 'php-curl', 'php-gd', 'php-imagick', 'php-intl', 'php-fpm']
+    pkg: ['icingaweb2', 'apache2', 'php-mysql', 'php-curl', 'php-gd', 'php-imagick', 'php-intl', 'php-fpm', 'libapache2-mod-wsgi-py3']
     state: present
 
 ### IDO
@@ -82,6 +82,7 @@
   loop:
     - proxy_fcgi
     - setenvif
+    - wsgi
   notify: reload apache2
 
 - name: Figure out PHP-FPM Apache configuration file
@@ -134,7 +135,7 @@
     path: "{{ item }}"
     state: absent
   with_items: "{{ httpsitesenabled.stdout_lines }}"
-  when: httpsitesenabled.stdout | length > 0 and item != "/etc/apache2/sites-enabled/icingaweb2.conf"
+  when: httpsitesenabled.stdout | length > 0 and item not in ["/etc/apache2/sites-enabled/icingaweb2.conf", "/etc/apache2/sites-enabled/graphite.conf"]
 
 ### Set up Apache Authentication
 - name: Delete old htpasswd file to force password updates and to get rid of deprecated users

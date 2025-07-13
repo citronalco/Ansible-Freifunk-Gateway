@@ -1,4 +1,12 @@
----
+- name: whisper-resize
+  become: yes
+  become_user: _graphite
+  shell: /usr/bin/whisper-auto-resize --doit /var/lib/graphite/whisper/icinga2 /etc/carbon
+
+- name: restart carbon-cache
+  service:
+    name: carbon-cache.service
+    state: restarted
 
 - name: reload icinga2
   service:
@@ -9,3 +17,8 @@
   service:
     name: apache2
     state: reloaded
+
+- name: restart apache2
+  service:
+    name: apache2.service
+    state: restarted

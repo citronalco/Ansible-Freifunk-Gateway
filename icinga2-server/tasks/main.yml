@@ -37,3 +37,11 @@
     path: '/etc/apache2/conf-enabled/icingaweb2-local.conf'
     state: absent
   notify: reload apache2
+
+- import_tasks: icinga2-graphite.yml
+  tags:
+    - 'role::icinga2-graphite'
+
+- import_tasks: icingaweb2-graphite.yml
+  tags:
+    - 'role::icingaweb2-graphite'
