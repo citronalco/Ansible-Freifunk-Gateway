@@ -29,14 +29,6 @@
   notify:
     - restart bind9
 
-- name: deploy named.conf.local
-  template:
-    src: named.conf.local.j2
-    dest: /etc/bind/named.conf.local
-    mode: "0644"
-  notify:
-    - restart bind9
-
 - name: deploy named.conf.options
   template:
     src: named.conf.options.j2
@@ -101,3 +93,4 @@
     mode: "0644"
   when:
     - domaenenliste is defined
+
