@@ -1,26 +1,47 @@
-#!/usr/bin/python
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+import os
 import collectd
-from pybrctl import BridgeController
 
-def getBridgeInterfaceCount():
-	ifcount = {}
-	brctl = BridgeController()
-	for br in brctl.showall():
-		ifcount[br.name] = len(br.getifs())
-	return ifcount
+PLUGIN_NAME = 'l2tp'
+
+def get_bridge_interface_count_sysfs():
+    counts = {}
+    base = '/sys/class/net'
+    try:
+        for ifname in os.listdir(base):
+            bridge_dir = os.path.join(base, ifname, 'bridge')
+            if not os.path.isdir(bridge_dir):
+                continue
+            brif_dir = os.path.join(base, ifname, 'brif')
+            try:
+                # alle Einträge in brif sind die enslaved Ports
+                ports = [e for e in os.listdir(brif_dir) if not e.startswith('.')]
+                counts[ifname] = len(ports)
+            except FileNotFoundError:
+                # keine Ports
+                counts[ifname] = 0
+    except Exception as e:
+        collectd.error('%s: sysfs scan failed: %r' % (PLUGIN_NAME, e))
+    return counts
 
 def read():
-	stats = getBridgeInterfaceCount()
-	globalCount = 0
-	for k,v in stats.items():
-		globalCount += v
-		vl = collectd.Values(type='if_count')
-		vl.plugin='l2tp'
-		vl.type_instance = k
-		vl.dispatch(values=[v])
-	vl = collectd.Values(type='if_count')
-	vl.plugin='l2tp'
-	vl.type_instance = 'all'
-	vl.dispatch(values=[globalCount])
+    stats = get_bridge_interface_count_sysfs()
+    total = 0
+    for br_name, port_count in stats.items():
+        total += port_count
+        vl = collectd.Values(type='if_count')
+        vl.plugin = PLUGIN_NAME
+        vl.type_instance = br_name
+        vl.dispatch(values=[port_count])
+    # Gesamt
+    vl = collectd.Values(type='if_count')
+    vl.plugin = PLUGIN_NAME
+    vl.type_instance = 'all'
+    vl.dispatch(values=[total])
 
+def init():
+    collectd.info('%s: plugin initialized' % PLUGIN_NAME)
+
+collectd.register_init(init)
 collectd.register_read(read)
