@@ -15,7 +15,7 @@
   check_mode: false
   changed_when: false
   register: more_specific_routes
-  with_items: "{{ domaenenliste | default([]) }}"
+  with_items: "{{ domaenenliste.keys() | default([]) }}"
   when: domaenenliste is defined
 
 - name: configure bird.conf

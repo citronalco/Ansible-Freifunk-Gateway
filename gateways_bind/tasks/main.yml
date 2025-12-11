@@ -77,7 +77,7 @@
     mode: "0644"
   notify:
     - restart bind9
-  with_items: "{{ domaenenliste | default([]) }}"
+  with_items: "{{ domaenenliste.keys() | default([]) }}"
   when: domaenenliste is defined
 
 - name: create folder for bind9.service file
