@@ -25,6 +25,10 @@ subnet {{domaenen[domaene[0]].ffv4_network | ansible.utils.ipaddr('network')}} n
     option domain-name  "{{dhcp_global.domain_search}}";
     option domain-search "{{dhcp_global.domain_search}}";
 {% endif %}
+
+{% if dhcp_global.option43_unifi_ip is defined and dhcp_global.option43_unifi_ip %}
+    option vendor-encapsulated-options 01:04:{{ dhcp_global.option43_unifi_ip | ansible.utils.ip4_hex(':') }};
+{% endif %}
 }
 
 {% endfor %}
