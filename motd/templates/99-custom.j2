@@ -21,7 +21,9 @@ echo " Aufgabe     : {{ server_aufgabe }}"
 {% else %}
 echo " " 
 {% endif %}
+{% if server_besitzer is defined %}
 echo " Besitzer    : {{ server_besitzer }}"
+{% endif %}
 {% if hoster is defined %}
 echo " Hoster      : {{ hoster }}"
 {% else %}
