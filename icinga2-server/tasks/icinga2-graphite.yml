@@ -22,24 +22,24 @@
     - restart carbon-cache
 
 - name: Limit carbon-cache LINE_RECEIVER_INTERFACE to 127.0.0.1
-  lineinfile:
+  replace:
     path: "/etc/carbon/carbon.conf"
-    regexp: '^LINE_RECEIVER_INTERFACE\s*='
-    line: 'LINE_RECEIVER_INTERFACE = 127.0.0.1'
+    regexp: '^LINE_RECEIVER_INTERFACE\s*=.*$'
+    replace: 'LINE_RECEIVER_INTERFACE = 127.0.0.1'
   notify: restart carbon-cache
 
 - name: Limit carbon-cache CACHE_QUERY_INTERFACE to 127.0.0.1
-  lineinfile:
+  replace:
     path: "/etc/carbon/carbon.conf"
-    regexp: '^CACHE_QUERY_INTERFACE\s*='
-    line: 'CACHE_QUERY_INTERFACE = 127.0.0.1'
+    regexp: '^CACHE_QUERY_INTERFACE\s*=.*$'
+    replace: 'CACHE_QUERY_INTERFACE = 127.0.0.1'
   notify: restart carbon-cache
 
 - name: Disable carbon-cache PICKLE_RECEIVER_PORT
-  lineinfile:
+  replace:
     path: '/etc/carbon/carbon.conf'
-    regexp: '^PICKLE_RECEIVER_PORT\s*='
-    line: 'PICKLE_RECEIVER_PORT = 0'
+    regexp: '^PICKLE_RECEIVER_PORT\s*=.*$'
+    replace: 'PICKLE_RECEIVER_PORT = 0'
   notify: restart carbon-cache
 
 - name: Configure Graphite - set SECRET_KEY

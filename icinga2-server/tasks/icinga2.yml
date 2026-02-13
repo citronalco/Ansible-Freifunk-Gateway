@@ -1,7 +1,7 @@
 ### Ansible Prerequisites
-- name: Install python3-pymysql (required by Ansible)
+- name: Install python3-pymysql and debconf-utils (required by Ansible)
   apt:
-    pkg: ['python3-pymysql']
+    pkg: ['python3-pymysql', 'debconf-utils']
 
 ### Icinga2
 - name: Install Icinga2
